@@ -1,20 +1,15 @@
+import 'package:book_library/src/core/app/main_app.dart';
+import 'package:book_library/src/core/di/injector.dart';
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-void main() {
-  runApp(const MainApp());
-}
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
 
-class MainApp extends StatelessWidget {
-  const MainApp({super.key});
+  final prefs = await SharedPreferences.getInstance();
+  GetIt.I.registerLazySingleton<SharedPreferences>(() => prefs);
 
-  @override
-  Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: Scaffold(
-        body: Center(
-          child: Text('Hello World!'),
-        ),
-      ),
-    );
-  }
+  await setupInjector();
+  runApp(MainApp());
 }
