@@ -7,9 +7,12 @@ import 'package:shared_preferences/shared_preferences.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  final getIt = GetIt.I;
+
   final prefs = await SharedPreferences.getInstance();
-  GetIt.I.registerLazySingleton<SharedPreferences>(() => prefs);
+  getIt.registerLazySingleton<SharedPreferences>(() => prefs);
 
   await setupInjector();
-  runApp(MainApp());
+
+  runApp(const MainApp());
 }

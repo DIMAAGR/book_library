@@ -7,8 +7,8 @@ abstract class KeyValueWrapper {
 }
 
 class SharedPreferencesWrapper implements KeyValueWrapper {
-  final SharedPreferences prefs;
   SharedPreferencesWrapper(this.prefs);
+  final SharedPreferences prefs;
 
   @override
   Future<bool> setString(String key, String value) => prefs.setString(key, value);

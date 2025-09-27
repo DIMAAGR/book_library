@@ -2,8 +2,8 @@ import 'package:book_library/src/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 
 class AppColorsExtension extends ThemeExtension<AppColorsExtension> {
-  final AppColors colors;
   const AppColorsExtension(this.colors);
+  final AppColors colors;
 
   @override
   AppColorsExtension copyWith({AppColors? colors}) => AppColorsExtension(colors ?? this.colors);

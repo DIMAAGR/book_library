@@ -1,6 +1,22 @@
 import 'dart:ui';
 
 sealed class AppColors {
+  const AppColors({
+    required this.primary,
+    required this.primaryLight,
+    required this.primaryDark,
+    required this.textPrimary,
+    required this.textSecondary,
+    required this.textLight,
+    required this.background,
+    required this.surface,
+    required this.border,
+    required this.error,
+    required this.warning,
+    required this.success,
+    required this.tapEffect,
+    required this.selectionEffect,
+  });
   final Color primary;
   final Color primaryLight;
   final Color primaryDark;
@@ -19,23 +35,6 @@ sealed class AppColors {
 
   final Color tapEffect;
   final Color selectionEffect;
-
-  const AppColors({
-    required this.primary,
-    required this.primaryLight,
-    required this.primaryDark,
-    required this.textPrimary,
-    required this.textSecondary,
-    required this.textLight,
-    required this.background,
-    required this.surface,
-    required this.border,
-    required this.error,
-    required this.warning,
-    required this.success,
-    required this.tapEffect,
-    required this.selectionEffect,
-  });
 }
 
 class AppColorsLight extends AppColors {

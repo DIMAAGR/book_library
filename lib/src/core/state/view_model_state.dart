@@ -1,8 +1,7 @@
 class ViewModelState<E, S> {
+  ViewModelState(this._success, this._error);
   final S? _success;
   final E? _error;
-
-  ViewModelState(this._success, this._error);
 }
 
 class InitialState<E, S> extends ViewModelState<E, S> {
