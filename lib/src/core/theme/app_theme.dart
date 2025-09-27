@@ -31,12 +31,21 @@ abstract class AppTheme {
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         ),
       ),
+      bottomNavigationBarTheme: BottomNavigationBarThemeData(
+        backgroundColor: colors.surface,
+        selectedItemColor: colors.primary,
+        unselectedItemColor: colors.textSecondary,
+        selectedLabelStyle: AppTextStyles.captionBold,
+        unselectedLabelStyle: AppTextStyles.caption,
+        type: BottomNavigationBarType.fixed,
+      ),
       popupMenuTheme: PopupMenuThemeData(
         color: Colors.white,
         textStyle: AppTextStyles.body1Regular,
       ),
       appBarTheme: AppBarTheme(
         backgroundColor: colors.background,
+        surfaceTintColor: colors.background,
         foregroundColor: colors.textPrimary,
         elevation: 0,
         centerTitle: false,

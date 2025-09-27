@@ -20,7 +20,11 @@ GoRouter buildRouter() {
         path: '/onboard',
         builder: (context, state) => OnboardView(viewModel: getIt()),
       ),
-      GoRoute(name: AppRoutes.home, path: '/home', builder: (context, state) => const HomeView()),
+      GoRoute(
+        name: AppRoutes.home,
+        path: '/home',
+        builder: (context, state) => HomeView(viewModel: getIt()),
+      ),
     ],
   );
 }

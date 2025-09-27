@@ -50,7 +50,7 @@ void main() {
     });
 
     test('emite ShowErrorSnackBar quando falha', () async {
-      when(mockGetDone()).thenAnswer((_) async => Left(StorageFailure('boom')));
+      when(mockGetDone()).thenAnswer((_) async => const Left(StorageFailure('boom')));
 
       await viewModel.decide();
 
