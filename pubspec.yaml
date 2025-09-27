@@ -16,6 +16,11 @@ dependencies:
   intl: ^0.20.2
   shared_preferences: ^2.5.3
   dartz: ^0.10.1
+  shimmer: ^3.0.0
+  dio: ^5.9.0
+  flutter_dotenv: ^6.0.0
+  
+  
 
 dev_dependencies:
   flutter_test:
@@ -31,6 +36,7 @@ flutter:
     - assets/fonts/montserrat/
     - assets/fonts/roboto/
     - assets/images/
+    - .env
 
   fonts:
     - family: Roboto

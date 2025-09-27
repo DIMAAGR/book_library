@@ -31,6 +31,9 @@ abstract class AppTextStyles {
   static TextStyle get caption =>
       const TextStyle(fontSize: 12, fontFamily: 'Roboto', fontWeight: FontWeight.w400);
 
+  static TextStyle get captionBold =>
+      const TextStyle(fontSize: 12, fontFamily: 'Roboto', fontWeight: FontWeight.w700);
+
   static TextStyle get button =>
       const TextStyle(fontSize: 14, fontFamily: 'Roboto', fontWeight: FontWeight.w500);
 }
