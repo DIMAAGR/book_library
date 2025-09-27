@@ -1,8 +1,8 @@
 import 'package:book_library/src/core/presentation/extensions/color_ext.dart';
+import 'package:book_library/src/core/theme/app_colors.dart';
+import 'package:book_library/src/core/theme/app_text_styles.dart';
+import 'package:book_library/src/core/theme/app_theme_mode_enum.dart';
 import 'package:flutter/material.dart';
-import 'app_colors.dart';
-import 'app_text_styles.dart';
-import 'app_theme_mode_enum.dart';
 
 abstract class AppTheme {
   static ThemeData resolve(AppThemeMode mode) {
@@ -17,7 +17,7 @@ abstract class AppTheme {
   }
 
   static ThemeData light() {
-    final colors = AppColorsLight();
+    final colors = const AppColorsLight();
     return ThemeData(
       brightness: Brightness.light,
       scaffoldBackgroundColor: colors.background,
@@ -45,7 +45,7 @@ abstract class AppTheme {
   }
 
   static ThemeData dark() {
-    final colors = AppColorsDark();
+    final colors = const AppColorsDark();
     return ThemeData(
       brightness: Brightness.dark,
       scaffoldBackgroundColor: colors.background,
@@ -73,7 +73,7 @@ abstract class AppTheme {
   }
 
   static ThemeData sepia() {
-    final colors = AppColorsSepia();
+    final colors = const AppColorsSepia();
     return ThemeData(
       brightness: Brightness.light,
       scaffoldBackgroundColor: colors.background,

@@ -19,6 +19,19 @@ Aplicativo Flutter desenvolvido como desafio técnico. O objetivo inicial era co
 
 Além do que foi pedido, o projeto ganhou algumas telas para enriquecer a experiência: - **Onboarding** com ilustrações para introduzir o app - **Tela de leitura** com: - controle de fonte (`Aa`) - espaçamento entre linhas - tema claro/escuro/sépia - **Tela de explorador** (explore) com sugestões e filtros - **Tela de configurações**: - alternância de tema (light, dark, sepia) - ajustes básicos de preferências - **Empty states**: - Sem resultados de busca - Favoritos vazios - Sem conexão
 
+### Launcher & Initial Flow
+O app introduz uma LauncherView como ponto de entrada.
+Sua responsabilidade é decidir a navegação inicial com base no estado do onboarding persistido no armazenamento local (SharedPreferences via KeyValueWrapper).
+ - Se o onboarding não foi concluído, o usuário é redirecionado para a OnboardView.
+ - Se o onboarding já foi concluído, o usuário é redirecionado diretamente para a HomeView.
+ - Essa decisão é controlada pelo GetOnboardingDoneUseCase e exposta através do LauncherViewModel.
+
+Para desacoplar navegação e feedbacks de UI transitórios do estado em si, o app utiliza um sistema de UI Event:
+ - NavigateTo para mudanças de rota
+ - ShowSnackBar, ShowErrorSnackBar, ShowSuccessSnackBar para mensagens únicas
+
+Isso garante que navegação e eventos efêmeros não fiquem misturados com o estado persistente (ViewModelState).
+
 ## Arquitetura
 
 O projeto segue **Feature-First + MVVM + Clean Architecture**:
@@ -101,6 +114,8 @@ flutter run
 ## Testes
 
 -   Testes unitários de usecases
+-   Testes unitários de datasources
+-   Testes unitários de repositorios
 -   Testes de viewmodels
 -   Cobertura mínima em regras de negócio
 

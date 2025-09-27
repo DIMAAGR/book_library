@@ -2,16 +2,15 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 class FadeIn extends StatefulWidget {
-  final Widget child;
-  final Duration delay;
-  final Duration duration;
-
   const FadeIn({
     super.key,
     required this.child,
     this.delay = Duration.zero,
     this.duration = const Duration(milliseconds: 300),
   });
+  final Widget child;
+  final Duration delay;
+  final Duration duration;
 
   @override
   State<FadeIn> createState() => _FadeInState();
