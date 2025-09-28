@@ -13,13 +13,19 @@ class BookCard extends StatelessWidget {
     this.onTap,
     required this.showPercentage,
     required this.showStars,
+    this.percentage = 50,
+    this.coverAspectRatio = 3 / 4,
+    this.coverHeight,
   });
 
   final BookEntity book;
   final ExternalBookInfoEntity? info;
   final VoidCallback? onTap;
+  final int percentage;
   final bool showPercentage;
   final bool showStars;
+  final double coverAspectRatio;
+  final double? coverHeight;
 
   @override
   Widget build(BuildContext context) {
@@ -40,54 +46,50 @@ class BookCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            LayoutBuilder(
-              builder: (context, constraints) {
-                return SizedBox(
-                  width: constraints.maxWidth,
-                  height: 260,
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
-                    child: Builder(
-                      builder: (context) {
-                        if (info == null) {
-                          return const BookCoverPlaceholder();
-                        }
+            SizedBox(
+              width: double.infinity,
+              height: coverHeight,
+              child: AspectRatio(
+                aspectRatio: coverAspectRatio,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: Builder(
+                    builder: (context) {
+                      if (info == null) {
+                        return const BookCoverPlaceholder();
+                      }
 
-                        if (coverUrl != null && coverUrl.isNotEmpty) {
-                          return Image.network(
-                            coverUrl,
-                            fit: BoxFit.cover,
-                            loadingBuilder: (context, child, event) {
-                              if (event == null) return child;
-                              return const BookCoverPlaceholder();
-                            },
-                            errorBuilder: (_, __, ___) => Container(
-                              color: colors.tapEffect,
-                              child: const Center(child: BookCoverPlaceholder(isNotFound: true)),
-                            ),
-                          );
-                        }
-
-                        return Container(
-                          color: colors.tapEffect,
-                          child: const Center(child: BookCoverPlaceholder(isNotFound: true)),
+                      if (coverUrl != null && coverUrl.isNotEmpty) {
+                        return Image.network(
+                          coverUrl,
+                          fit: BoxFit.cover,
+                          loadingBuilder: (context, child, event) {
+                            if (event == null) return child;
+                            return const BookCoverPlaceholder();
+                          },
+                          errorBuilder: (_, __, ___) => Container(
+                            color: colors.tapEffect,
+                            child: const Center(child: BookCoverPlaceholder(isNotFound: true)),
+                          ),
                         );
-                      },
-                    ),
+                      }
+
+                      return Container(
+                        color: colors.tapEffect,
+                        child: const Center(child: BookCoverPlaceholder(isNotFound: true)),
+                      );
+                    },
                   ),
-                );
-              },
+                ),
+              ),
             ),
-
             const SizedBox(height: 12),
-
             Text(
               book.title,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
               style: AppTextStyles.body1Bold,
             ),
-
             Text(
               book.author,
               maxLines: 1,
@@ -105,19 +107,21 @@ class BookCard extends StatelessWidget {
               ),
               const SizedBox(height: 6),
             ],
-
             if (showPercentage) ...[
               ClipRRect(
                 borderRadius: BorderRadius.circular(8),
                 child: LinearProgressIndicator(
-                  value: 0.5,
+                  value: percentage / 100,
                   backgroundColor: colors.tapEffect,
                   color: colors.primary,
                   minHeight: 6,
                 ),
               ),
               const SizedBox(height: 4),
-              Text('50% read', style: AppTextStyles.caption.copyWith(color: colors.textSecondary)),
+              Text(
+                '$percentage% read',
+                style: AppTextStyles.caption.copyWith(color: colors.textSecondary),
+              ),
             ],
           ],
         ),

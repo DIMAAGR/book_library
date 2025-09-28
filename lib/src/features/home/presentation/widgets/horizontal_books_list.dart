@@ -42,6 +42,7 @@ class HorizontalBooksList extends StatelessWidget {
                 book: book,
                 info: info,
                 onTap: () {},
+
                 showPercentage: showPercentage,
                 showStars: showStars,
               );

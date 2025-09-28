@@ -29,6 +29,7 @@ import 'package:book_library/src/features/books_details/domain/use_cases/get_boo
 import 'package:book_library/src/features/books_details/services/external_book_info_resolver.dart';
 import 'package:book_library/src/features/home/presentation/view_model/home_view_model.dart';
 import 'package:book_library/src/features/launcher/presentation/view_model/launcher_view_model.dart';
+import 'package:book_library/src/features/library/presentation/view_model/library_view_model.dart';
 import 'package:book_library/src/features/onboard/data/datasources/local_data_source.dart';
 import 'package:book_library/src/features/onboard/data/datasources/local_data_source_impl.dart';
 import 'package:book_library/src/features/onboard/data/repositories/onboard_repository_impl.dart';
@@ -79,13 +80,16 @@ Future<void> setupInjector() async {
 
   /// -------------Onboard-------------------
   getIt.registerLazySingleton<OnboardContentProvider>(() => OnboardContentStatic());
-  getIt.registerFactory<OnboardViewModel>(() => OnboardViewModel(getIt(), getIt()));
+  getIt.registerLazySingleton<OnboardViewModel>(() => OnboardViewModel(getIt(), getIt()));
 
   /// --------------Launcher-----------------
-  getIt.registerFactory<LauncherViewModel>(() => LauncherViewModel(getIt()));
+  getIt.registerLazySingleton<LauncherViewModel>(() => LauncherViewModel(getIt()));
 
   /// ----------------Home-------------------
-  getIt.registerFactory<HomeViewModel>(() => HomeViewModel(getIt(), getIt(), getIt()));
+  getIt.registerLazySingleton<HomeViewModel>(() => HomeViewModel(getIt(), getIt(), getIt()));
+
+  /// ----------------Library-----------------
+  getIt.registerLazySingleton<LibraryViewModel>(() => LibraryViewModel(getIt(), getIt(), getIt()));
 
   /// --------------Use Cases-----------------
   getIt.registerLazySingleton<GetAllBooksUseCase>(() => GetAllBooksUseCaseImpl(getIt()));

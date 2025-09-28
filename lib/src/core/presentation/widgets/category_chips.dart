@@ -27,22 +27,26 @@ class CategoryChips extends StatelessWidget {
           final active = c.id == activeId;
           return Padding(
             padding: const EdgeInsets.only(right: 12),
-            child: InkWell(
-              borderRadius: BorderRadius.circular(24),
-              onTap: () => onTap(c.id),
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
-                decoration: BoxDecoration(
-                  color: active ? colors.selectionEffect : colors.surface,
+            child: ElevatedButton(
+              onPressed: () => onTap(c.id),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: active ? colors.primary : colors.surface,
+                foregroundColor: active ? colors.textLight : colors.textPrimary,
+                shadowColor: Colors.transparent,
+                overlayColor: colors.primaryLight,
+                shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(24),
-                  border: Border.all(color: colors.border),
+                  side: BorderSide(color: colors.border),
                 ),
-                child: Text(
-                  c.name,
-                  style: AppTextStyles.body2Regular.copyWith(
-                    color: active ? colors.primaryDark : colors.textPrimary,
-                    fontWeight: active ? FontWeight.w600 : FontWeight.w400,
-                  ),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
+                elevation: 0,
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              ),
+              child: Text(
+                c.name,
+                style: AppTextStyles.body2Regular.copyWith(
+                  color: active ? colors.textLight : colors.textPrimary,
+                  fontWeight: active ? FontWeight.w600 : FontWeight.w400,
                 ),
               ),
             ),
