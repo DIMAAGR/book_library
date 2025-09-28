@@ -1,12 +1,13 @@
 import 'package:book_library/src/core/failures/failures.dart';
 import 'package:book_library/src/core/presentation/views/offiline_view.dart';
+import 'package:book_library/src/core/presentation/widgets/book_library_app_bar.dart';
 import 'package:book_library/src/core/presentation/widgets/book_library_bottom_navigation_bar.dart';
+import 'package:book_library/src/core/presentation/widgets/category_chips.dart';
 import 'package:book_library/src/core/routes/app_routes.dart';
 import 'package:book_library/src/core/state/ui_event.dart';
 import 'package:book_library/src/core/state/view_model_state.dart';
 import 'package:book_library/src/features/home/presentation/view_model/home_view_model.dart';
 import 'package:book_library/src/features/home/presentation/view_model/home_view_model_state.dart';
-import 'package:book_library/src/features/home/presentation/widgets/category_chips.dart';
 import 'package:book_library/src/features/home/presentation/widgets/home_skeleton.dart';
 import 'package:book_library/src/features/home/presentation/widgets/horizontal_books_list.dart';
 import 'package:book_library/src/features/home/presentation/widgets/section_header.dart';
@@ -66,18 +67,11 @@ class _HomeViewState extends State<HomeView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Library'),
-        centerTitle: true,
-        leading: IconButton(icon: const Icon(Icons.menu_rounded), onPressed: () {}),
-        actions: [
-          IconButton(icon: const Icon(Icons.search_rounded), onPressed: () {}),
-          IconButton(
-            icon: const Icon(Icons.settings_outlined),
-            onPressed: () => context.goNamed(AppRoutes.settings),
-          ),
-          const SizedBox(width: 8),
-        ],
+      appBar: const BookLibraryAppBar(
+        title: 'Library',
+        showMenu: true,
+        showSearch: true,
+        showSettings: true,
       ),
       bottomNavigationBar: const BookLibraryBottomNavigationBar(),
       body: SafeArea(
@@ -104,7 +98,11 @@ class _HomeViewState extends State<HomeView> {
                     activeId: data.activeCategoryId,
                     onTap: viewModel.selectCategory,
                   ),
-                  SectionHeader(title: 'Library', action: 'See all', onTap: () {}),
+                  SectionHeader(
+                    title: 'Library',
+                    action: 'See all',
+                    onTap: () => context.pushNamed(AppRoutes.library),
+                  ),
                   HorizontalBooksList(
                     byBookId: viewModel.byBookId,
                     resolveFor: viewModel.resolveFor,

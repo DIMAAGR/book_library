@@ -8,4 +8,5 @@ abstract class AppRoutes {
   static const String readBook = '/readBook';
   static const String settings = '/settings';
   static const String launcher = '/launcher';
+  static const String library = '/library';
 }
