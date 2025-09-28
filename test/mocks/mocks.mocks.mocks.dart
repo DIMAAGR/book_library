@@ -29,6 +29,8 @@ import 'package:book_library/src/features/books/domain/repositories/categories_r
     as _i36;
 import 'package:book_library/src/features/books/domain/usecases/get_all_books_use_case.dart'
     as _i23;
+import 'package:book_library/src/features/books/domain/usecases/get_book_by_title_use_case.dart'
+    as _i38;
 import 'package:book_library/src/features/books/domain/usecases/get_categories_use_case.dart'
     as _i25;
 import 'package:book_library/src/features/books_details/data/datasources/external_catalog_remote_data_source.dart'
@@ -41,6 +43,16 @@ import 'package:book_library/src/features/books_details/domain/use_cases/get_boo
     as _i3;
 import 'package:book_library/src/features/books_details/services/external_book_info_resolver.dart'
     as _i27;
+import 'package:book_library/src/features/favorites/data/datasource/favorites_local_data_source.dart'
+    as _i37;
+import 'package:book_library/src/features/favorites/domain/repository/favorites_repository.dart'
+    as _i42;
+import 'package:book_library/src/features/favorites/domain/use_cases/get_favorites_id_use_case.dart'
+    as _i39;
+import 'package:book_library/src/features/favorites/domain/use_cases/is_favorite_use_case.dart'
+    as _i41;
+import 'package:book_library/src/features/favorites/domain/use_cases/toggle_favorite_use_case.dart'
+    as _i40;
 import 'package:book_library/src/features/onboard/data/datasources/local_data_source.dart'
     as _i16;
 import 'package:book_library/src/features/onboard/domain/repository/onboard_repository.dart'
@@ -1461,4 +1473,193 @@ class MockCategoriesRepository extends _i1.Mock
                 ),
           )
           as _i14.Future<_i2.Either<_i18.Failure, List<_i26.CategoryEntity>>>);
+}
+
+/// A class which mocks [FavoritesLocalDataSource].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockFavoritesLocalDataSource extends _i1.Mock
+    implements _i37.FavoritesLocalDataSource {
+  MockFavoritesLocalDataSource() {
+    _i1.throwOnMissingStub(this);
+  }
+
+  @override
+  _i14.Future<Set<String>> readIds() =>
+      (super.noSuchMethod(
+            Invocation.method(#readIds, []),
+            returnValue: _i14.Future<Set<String>>.value(<String>{}),
+          )
+          as _i14.Future<Set<String>>);
+
+  @override
+  _i14.Future<void> writeIds(Set<String>? ids) =>
+      (super.noSuchMethod(
+            Invocation.method(#writeIds, [ids]),
+            returnValue: _i14.Future<void>.value(),
+            returnValueForMissingStub: _i14.Future<void>.value(),
+          )
+          as _i14.Future<void>);
+}
+
+/// A class which mocks [GetBookByTitleUseCase].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockGetBookByTitleUseCase extends _i1.Mock
+    implements _i38.GetBookByTitleUseCase {
+  MockGetBookByTitleUseCase() {
+    _i1.throwOnMissingStub(this);
+  }
+
+  @override
+  _i14.Future<_i2.Either<_i18.Failure, List<_i24.BookEntity>>> call(
+    String? query,
+  ) =>
+      (super.noSuchMethod(
+            Invocation.method(#call, [query]),
+            returnValue:
+                _i14.Future<
+                  _i2.Either<_i18.Failure, List<_i24.BookEntity>>
+                >.value(
+                  _FakeEither_0<_i18.Failure, List<_i24.BookEntity>>(
+                    this,
+                    Invocation.method(#call, [query]),
+                  ),
+                ),
+          )
+          as _i14.Future<_i2.Either<_i18.Failure, List<_i24.BookEntity>>>);
+}
+
+/// A class which mocks [GetFavoritesIdsUseCase].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockGetFavoritesIdsUseCase extends _i1.Mock
+    implements _i39.GetFavoritesIdsUseCase {
+  MockGetFavoritesIdsUseCase() {
+    _i1.throwOnMissingStub(this);
+  }
+
+  @override
+  _i14.Future<_i2.Either<_i18.Failure, Set<String>>> call() =>
+      (super.noSuchMethod(
+            Invocation.method(#call, []),
+            returnValue:
+                _i14.Future<_i2.Either<_i18.Failure, Set<String>>>.value(
+                  _FakeEither_0<_i18.Failure, Set<String>>(
+                    this,
+                    Invocation.method(#call, []),
+                  ),
+                ),
+          )
+          as _i14.Future<_i2.Either<_i18.Failure, Set<String>>>);
+}
+
+/// A class which mocks [ToggleFavoriteUseCase].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockToggleFavoriteUseCase extends _i1.Mock
+    implements _i40.ToggleFavoriteUseCase {
+  MockToggleFavoriteUseCase() {
+    _i1.throwOnMissingStub(this);
+  }
+
+  @override
+  _i14.Future<_i2.Either<_i18.Failure, Set<String>>> call(String? bookId) =>
+      (super.noSuchMethod(
+            Invocation.method(#call, [bookId]),
+            returnValue:
+                _i14.Future<_i2.Either<_i18.Failure, Set<String>>>.value(
+                  _FakeEither_0<_i18.Failure, Set<String>>(
+                    this,
+                    Invocation.method(#call, [bookId]),
+                  ),
+                ),
+          )
+          as _i14.Future<_i2.Either<_i18.Failure, Set<String>>>);
+}
+
+/// A class which mocks [IsFavoriteUseCase].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockIsFavoriteUseCase extends _i1.Mock implements _i41.IsFavoriteUseCase {
+  MockIsFavoriteUseCase() {
+    _i1.throwOnMissingStub(this);
+  }
+
+  @override
+  _i14.Future<_i2.Either<_i18.Failure, bool>> call(String? bookId) =>
+      (super.noSuchMethod(
+            Invocation.method(#call, [bookId]),
+            returnValue: _i14.Future<_i2.Either<_i18.Failure, bool>>.value(
+              _FakeEither_0<_i18.Failure, bool>(
+                this,
+                Invocation.method(#call, [bookId]),
+              ),
+            ),
+          )
+          as _i14.Future<_i2.Either<_i18.Failure, bool>>);
+}
+
+/// A class which mocks [FavoritesRepository].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockFavoritesRepository extends _i1.Mock
+    implements _i42.FavoritesRepository {
+  MockFavoritesRepository() {
+    _i1.throwOnMissingStub(this);
+  }
+
+  @override
+  _i14.Future<_i2.Either<_i18.Failure, Set<String>>> getAllIds() =>
+      (super.noSuchMethod(
+            Invocation.method(#getAllIds, []),
+            returnValue:
+                _i14.Future<_i2.Either<_i18.Failure, Set<String>>>.value(
+                  _FakeEither_0<_i18.Failure, Set<String>>(
+                    this,
+                    Invocation.method(#getAllIds, []),
+                  ),
+                ),
+          )
+          as _i14.Future<_i2.Either<_i18.Failure, Set<String>>>);
+
+  @override
+  _i14.Future<_i2.Either<_i18.Failure, void>> setAllIds(Set<String>? ids) =>
+      (super.noSuchMethod(
+            Invocation.method(#setAllIds, [ids]),
+            returnValue: _i14.Future<_i2.Either<_i18.Failure, void>>.value(
+              _FakeEither_0<_i18.Failure, void>(
+                this,
+                Invocation.method(#setAllIds, [ids]),
+              ),
+            ),
+          )
+          as _i14.Future<_i2.Either<_i18.Failure, void>>);
+
+  @override
+  _i14.Future<_i2.Either<_i18.Failure, bool>> isFavorite(String? bookId) =>
+      (super.noSuchMethod(
+            Invocation.method(#isFavorite, [bookId]),
+            returnValue: _i14.Future<_i2.Either<_i18.Failure, bool>>.value(
+              _FakeEither_0<_i18.Failure, bool>(
+                this,
+                Invocation.method(#isFavorite, [bookId]),
+              ),
+            ),
+          )
+          as _i14.Future<_i2.Either<_i18.Failure, bool>>);
+
+  @override
+  _i14.Future<_i2.Either<_i18.Failure, Set<String>>> toggle(String? bookId) =>
+      (super.noSuchMethod(
+            Invocation.method(#toggle, [bookId]),
+            returnValue:
+                _i14.Future<_i2.Either<_i18.Failure, Set<String>>>.value(
+                  _FakeEither_0<_i18.Failure, Set<String>>(
+                    this,
+                    Invocation.method(#toggle, [bookId]),
+                  ),
+                ),
+          )
+          as _i14.Future<_i2.Either<_i18.Failure, Set<String>>>);
 }

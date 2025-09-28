@@ -19,6 +19,7 @@ import 'package:book_library/src/features/books/data/repositories/categories_rep
 import 'package:book_library/src/features/books/domain/repositories/books_repository.dart';
 import 'package:book_library/src/features/books/domain/repositories/categories_repository.dart';
 import 'package:book_library/src/features/books/domain/usecases/get_all_books_use_case.dart';
+import 'package:book_library/src/features/books/domain/usecases/get_book_by_title_use_case.dart';
 import 'package:book_library/src/features/books/domain/usecases/get_categories_use_case.dart';
 import 'package:book_library/src/features/books_details/data/datasources/external_catalog_remote_data_source.dart';
 import 'package:book_library/src/features/books_details/data/datasources/external_catalog_remote_data_source_impl.dart';
@@ -27,6 +28,13 @@ import 'package:book_library/src/features/books_details/domain/entites/external_
 import 'package:book_library/src/features/books_details/domain/repositories/book_details_repository.dart';
 import 'package:book_library/src/features/books_details/domain/use_cases/get_book_details_use_case.dart';
 import 'package:book_library/src/features/books_details/services/external_book_info_resolver.dart';
+import 'package:book_library/src/features/favorites/data/datasource/favorites_local_data_source.dart';
+import 'package:book_library/src/features/favorites/data/datasource/favorites_local_data_source_impl.dart';
+import 'package:book_library/src/features/favorites/data/repository/favorites_repository_impl.dart';
+import 'package:book_library/src/features/favorites/domain/repository/favorites_repository.dart';
+import 'package:book_library/src/features/favorites/domain/use_cases/get_favorites_id_use_case.dart';
+import 'package:book_library/src/features/favorites/domain/use_cases/is_favorite_use_case.dart';
+import 'package:book_library/src/features/favorites/domain/use_cases/toggle_favorite_use_case.dart';
 import 'package:book_library/src/features/home/presentation/view_model/home_view_model.dart';
 import 'package:book_library/src/features/launcher/presentation/view_model/launcher_view_model.dart';
 import 'package:book_library/src/features/library/presentation/view_model/library_view_model.dart';
@@ -38,6 +46,7 @@ import 'package:book_library/src/features/onboard/domain/use_cases/get_onboardin
 import 'package:book_library/src/features/onboard/domain/use_cases/set_onboarding_done_use_case.dart';
 import 'package:book_library/src/features/onboard/presentation/services/onboard_content_provider.dart';
 import 'package:book_library/src/features/onboard/presentation/view_model/onboard_view_model.dart';
+import 'package:book_library/src/features/search/presentation/view_model/search_view_model.dart';
 import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
 
@@ -51,6 +60,7 @@ Future<void> setupInjector() async {
   getIt.registerLazySingleton<OnboardingRepository>(() => OnboardingRepositoryImpl(getIt()));
   getIt.registerLazySingleton<BooksRepository>(() => BooksRepositoryImpl(getIt()));
   getIt.registerLazySingleton<CategoriesRepository>(() => CategoriesRepositoryImpl(getIt()));
+  getIt.registerLazySingleton<FavoritesRepository>(() => FavoritesRepositoryImpl(getIt()));
 
   getIt.registerLazySingleton<Dio>(
     () => DioFactory.create(baseUrl: AppEnv.apiBaseUrl),
@@ -59,6 +69,10 @@ Future<void> setupInjector() async {
   getIt.registerLazySingleton<Dio>(
     () => DioFactory.create(baseUrl: AppEnv.catalogBaseUrl),
     instanceName: 'catalog',
+  );
+
+  getIt.registerLazySingleton<FavoritesLocalDataSource>(
+    () => FavoritesLocalDataSourceImpl(getIt()),
   );
 
   getIt.registerLazySingleton<CategoriesFakeDataSource>(() => CategoriesFakeDataSourceImpl());
@@ -91,10 +105,20 @@ Future<void> setupInjector() async {
   /// ----------------Library-----------------
   getIt.registerLazySingleton<LibraryViewModel>(() => LibraryViewModel(getIt(), getIt(), getIt()));
 
+  /// ----------------Search-----------------
+  getIt.registerFactory<SearchViewModel>(
+    () => SearchViewModel(getIt(), getIt(), getIt(), getIt(), getIt()),
+  );
+
   /// --------------Use Cases-----------------
   getIt.registerLazySingleton<GetAllBooksUseCase>(() => GetAllBooksUseCaseImpl(getIt()));
   getIt.registerLazySingleton<GetCategoriesUseCase>(() => GetCategoriesUseCaseImpl(getIt()));
   getIt.registerLazySingleton<GetBookDetailsUseCase>(() => GetBookDetailsUseCaseImpl(getIt()));
+  getIt.registerLazySingleton<GetFavoritesIdsUseCase>(() => GetFavoritesIdsUseCaseImpl(getIt()));
+  getIt.registerLazySingleton<ToggleFavoriteUseCase>(() => ToggleFavoriteUseCaseImpl(getIt()));
+  getIt.registerLazySingleton<IsFavoriteUseCase>(() => IsFavoriteUseCaseImpl(getIt()));
+  getIt.registerLazySingleton<GetBookByTitleUseCase>(() => GetBookByTitleUseCaseImpl(getIt()));
+
   getIt.registerLazySingleton<GetOnboardingDoneUseCase>(
     () => GetOnboardingDoneUseCaseImpl(getIt()),
   );

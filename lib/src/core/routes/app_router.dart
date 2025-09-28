@@ -3,6 +3,7 @@ import 'package:book_library/src/features/home/presentation/view/home_view.dart'
 import 'package:book_library/src/features/launcher/presentation/view/launcher_view.dart';
 import 'package:book_library/src/features/library/presentation/view/library_view.dart';
 import 'package:book_library/src/features/onboard/presentation/view/onboard_view.dart';
+import 'package:book_library/src/features/search/presentation/view/search_view.dart';
 import 'package:get_it/get_it.dart';
 import 'package:go_router/go_router.dart';
 
@@ -30,6 +31,11 @@ GoRouter buildRouter() {
         path: AppRoutes.library,
         name: AppRoutes.library,
         builder: (context, state) => LibraryView(viewModel: getIt()),
+      ),
+      GoRoute(
+        name: AppRoutes.search,
+        path: AppRoutes.search,
+        builder: (context, state) => SearchView(viewModel: getIt()),
       ),
     ],
   );

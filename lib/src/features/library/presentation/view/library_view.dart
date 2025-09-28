@@ -1,5 +1,7 @@
 import 'package:book_library/src/core/presentation/extensions/color_ext.dart';
+import 'package:book_library/src/core/presentation/widgets/book_library_app_bar.dart';
 import 'package:book_library/src/core/presentation/widgets/category_chips.dart';
+import 'package:book_library/src/core/presentation/widgets/snackbars.dart';
 import 'package:book_library/src/core/state/ui_event.dart';
 import 'package:book_library/src/core/state/view_model_state.dart';
 import 'package:book_library/src/core/theme/app_text_styles.dart';
@@ -29,37 +31,15 @@ class _LibraryViewState extends State<LibraryView> {
     vm.load();
 
     _eventL = () {
-      final evt = vm.event.value;
-      if (evt == null || !mounted) return;
+      final event = vm.event.value;
+      if (event == null || !mounted) return;
 
-      if (evt is ShowErrorSnackBar) {
-        final c = Theme.of(context).colors;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            backgroundColor: c.error,
-            content: Row(
-              children: [
-                Icon(Icons.error_outline, color: c.textLight),
-                const SizedBox(width: 8),
-                Text(evt.message, style: AppTextStyles.body2Regular.copyWith(color: c.textLight)),
-              ],
-            ),
-          ),
-        );
-      } else if (evt is ShowSnackBar) {
-        final c = Theme.of(context).colors;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            backgroundColor: c.primary,
-            content: Row(
-              children: [
-                Icon(Icons.info_outline, color: c.textLight),
-                const SizedBox(width: 8),
-                Text(evt.message, style: AppTextStyles.body2Regular.copyWith(color: c.textLight)),
-              ],
-            ),
-          ),
-        );
+      if (event is ShowErrorSnackBar) {
+        BookLibrarySnackBars.errorSnackBar(context, event.message);
+      } else if (event is ShowSuccessSnackBar) {
+        BookLibrarySnackBars.successSnackbar(context, event.message);
+      } else if (event is ShowSnackBar) {
+        BookLibrarySnackBars.informativeSnackBar(context, event.message);
       }
       vm.consumeEvent();
     };
@@ -79,21 +59,13 @@ class _LibraryViewState extends State<LibraryView> {
     final colors = Theme.of(context).colors;
 
     return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        title: Text('Library', style: AppTextStyles.h6.copyWith(color: colors.textPrimary)),
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back_rounded, color: colors.textPrimary),
-          onPressed: () => Navigator.of(context).maybePop(),
-        ),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.search_rounded, color: colors.textPrimary),
-            onPressed: () {},
-          ),
-          const SizedBox(width: 8),
-        ],
+      appBar: const BookLibraryAppBar(
+        title: 'Library',
+        showMenu: false,
+        showSearch: true,
+        showSettings: false,
       ),
+
       body: SafeArea(
         child: ValueListenableBuilder<ViewModelState<dynamic, LibraryData>>(
           valueListenable: vm.state,

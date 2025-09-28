@@ -1,5 +1,7 @@
 import 'package:book_library/src/core/presentation/extensions/color_ext.dart';
+import 'package:book_library/src/core/routes/app_routes.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class BookLibraryAppBar extends StatelessWidget implements PreferredSizeWidget {
   const BookLibraryAppBar({
@@ -9,12 +11,10 @@ class BookLibraryAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.showSearch = false,
     required this.title,
     this.onMenuTap,
-    this.onSearchTap,
     this.onSettingsPressed,
   });
   final bool showMenu;
   final VoidCallback? onMenuTap;
-  final VoidCallback? onSearchTap;
   final bool showSettings;
   final bool showSearch;
   final String title;
@@ -36,7 +36,9 @@ class BookLibraryAppBar extends StatelessWidget implements PreferredSizeWidget {
         if (showSearch)
           IconButton(
             icon: Icon(Icons.search_rounded, color: colors.textPrimary),
-            onPressed: onSearchTap,
+            onPressed: () {
+              context.pushNamed(AppRoutes.search);
+            },
           ),
         if (showSettings)
           IconButton(

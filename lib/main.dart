@@ -14,6 +14,7 @@ void main() async {
   getIt.registerLazySingleton<SharedPreferences>(() => prefs);
 
   await dotenv.load(fileName: '.env');
+
   await setupInjector();
 
   runApp(const MainApp());

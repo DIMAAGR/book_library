@@ -3,6 +3,7 @@ import 'package:book_library/src/core/presentation/views/offiline_view.dart';
 import 'package:book_library/src/core/presentation/widgets/book_library_app_bar.dart';
 import 'package:book_library/src/core/presentation/widgets/book_library_bottom_navigation_bar.dart';
 import 'package:book_library/src/core/presentation/widgets/category_chips.dart';
+import 'package:book_library/src/core/presentation/widgets/snackbars.dart';
 import 'package:book_library/src/core/routes/app_routes.dart';
 import 'package:book_library/src/core/state/ui_event.dart';
 import 'package:book_library/src/core/state/view_model_state.dart';
@@ -46,11 +47,11 @@ class _HomeViewState extends State<HomeView> {
       if (event == null || !mounted) return;
 
       if (event is ShowErrorSnackBar) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(event.message)));
+        BookLibrarySnackBars.errorSnackBar(context, event.message);
       } else if (event is ShowSuccessSnackBar) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(event.message)));
+        BookLibrarySnackBars.successSnackbar(context, event.message);
       } else if (event is ShowSnackBar) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(event.message)));
+        BookLibrarySnackBars.informativeSnackBar(context, event.message);
       } else if (event is NavigateTo) {
         context.goNamed(event.route);
       } else if (event is Pop) {
