@@ -31,6 +31,12 @@ abstract class AppTheme {
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         ),
       ),
+      bottomSheetTheme: BottomSheetThemeData(
+        backgroundColor: colors.surface,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+        ),
+      ),
       bottomNavigationBarTheme: BottomNavigationBarThemeData(
         backgroundColor: colors.surface,
         selectedItemColor: colors.primary,
@@ -68,6 +74,20 @@ abstract class AppTheme {
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         ),
       ),
+      bottomSheetTheme: BottomSheetThemeData(
+        backgroundColor: colors.surface,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+        ),
+      ),
+      bottomNavigationBarTheme: BottomNavigationBarThemeData(
+        backgroundColor: colors.surface,
+        selectedItemColor: colors.primary,
+        unselectedItemColor: colors.textSecondary,
+        selectedLabelStyle: AppTextStyles.captionBold,
+        unselectedLabelStyle: AppTextStyles.caption,
+        type: BottomNavigationBarType.fixed,
+      ),
       popupMenuTheme: PopupMenuThemeData(
         color: const Color(0xFF202020),
         textStyle: AppTextStyles.body1Regular.copyWith(color: colors.textPrimary),
@@ -95,6 +115,20 @@ abstract class AppTheme {
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         ),
+      ),
+      bottomSheetTheme: BottomSheetThemeData(
+        backgroundColor: colors.surface,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+        ),
+      ),
+      bottomNavigationBarTheme: BottomNavigationBarThemeData(
+        backgroundColor: colors.surface,
+        selectedItemColor: colors.primary,
+        unselectedItemColor: colors.textSecondary,
+        selectedLabelStyle: AppTextStyles.captionBold,
+        unselectedLabelStyle: AppTextStyles.caption,
+        type: BottomNavigationBarType.fixed,
       ),
       popupMenuTheme: PopupMenuThemeData(
         color: colors.surface,
