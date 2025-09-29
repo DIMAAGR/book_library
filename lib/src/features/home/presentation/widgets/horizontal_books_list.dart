@@ -1,6 +1,6 @@
 import 'package:book_library/src/features/books/domain/entities/book_entity.dart';
 import 'package:book_library/src/features/books/presentation/widgets/book_card.dart';
-import 'package:book_library/src/features/books_details/domain/entites/external_book_info_entity.dart';
+import 'package:book_library/src/features/home/presentation/view_model/home_state_object.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -9,14 +9,14 @@ class HorizontalBooksList extends StatelessWidget {
     super.key,
     required this.list,
     required this.resolveFor,
-    required this.byBookId,
+    required this.homeState,
     this.showPercentage = true,
     this.showStars = true,
   });
 
-  final Future<void> Function(BookEntity book) resolveFor;
-  final ValueListenable<Map<String, ExternalBookInfoEntity>> byBookId;
   final List<BookEntity> list;
+  final Future<void> Function(BookEntity book) resolveFor;
+  final ValueListenable<HomeStateObject> homeState;
   final bool showPercentage;
   final bool showStars;
 
@@ -31,18 +31,16 @@ class HorizontalBooksList extends StatelessWidget {
         separatorBuilder: (_, __) => const SizedBox(width: 16),
         itemBuilder: (_, i) {
           final book = list[i];
-
           resolveFor(book);
 
-          return ValueListenableBuilder<Map<String, ExternalBookInfoEntity>>(
-            valueListenable: byBookId,
-            builder: (_, map, __) {
-              final info = map[book.id];
+          return ValueListenableBuilder<HomeStateObject>(
+            valueListenable: homeState,
+            builder: (_, hs, __) {
+              final info = hs.byBookId[book.id];
               return BookCard(
                 book: book,
                 info: info,
                 onTap: () {},
-
                 showPercentage: showPercentage,
                 showStars: showStars,
               );

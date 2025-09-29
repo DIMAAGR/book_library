@@ -7,8 +7,8 @@ import 'package:book_library/src/core/presentation/widgets/snackbars.dart';
 import 'package:book_library/src/core/routes/app_routes.dart';
 import 'package:book_library/src/core/state/ui_event.dart';
 import 'package:book_library/src/core/state/view_model_state.dart';
+import 'package:book_library/src/features/home/presentation/view_model/home_state_object.dart';
 import 'package:book_library/src/features/home/presentation/view_model/home_view_model.dart';
-import 'package:book_library/src/features/home/presentation/view_model/home_view_model_state.dart';
 import 'package:book_library/src/features/home/presentation/widgets/home_skeleton.dart';
 import 'package:book_library/src/features/home/presentation/widgets/horizontal_books_list.dart';
 import 'package:book_library/src/features/home/presentation/widgets/section_header.dart';
@@ -25,7 +25,6 @@ class HomeView extends StatefulWidget {
 
 class _HomeViewState extends State<HomeView> {
   late final VoidCallback _eventDisposer;
-
   HomeViewModel get viewModel => widget.viewModel;
 
   @override
@@ -76,19 +75,23 @@ class _HomeViewState extends State<HomeView> {
       ),
       bottomNavigationBar: const BookLibraryBottomNavigationBar(),
       body: SafeArea(
-        child: ValueListenableBuilder<ViewModelState<Failure, HomeData>>(
+        child: ValueListenableBuilder<HomeStateObject>(
           valueListenable: viewModel.state,
-          builder: (context, s, _) {
-            if (s is LoadingState<Failure, HomeData>) {
+          builder: (context, home, _) {
+            final s = home.state;
+
+            if (s is LoadingState<Failure, HomePayload>) {
               return const HomeSkeleton();
             }
-            if (s is ErrorState<Failure, HomeData>) {
+
+            if (s is ErrorState<Failure, HomePayload>) {
               return OfflineView(
                 onRetry: () => viewModel.load(),
                 onOpenSettings: () => context.goNamed(AppRoutes.settings),
               );
             }
-            if (s is SuccessState<Failure, HomeData>) {
+
+            if (s is SuccessState<Failure, HomePayload>) {
               final data = s.success;
 
               return ListView(
@@ -105,9 +108,9 @@ class _HomeViewState extends State<HomeView> {
                     onTap: () => context.pushNamed(AppRoutes.library),
                   ),
                   HorizontalBooksList(
-                    byBookId: viewModel.byBookId,
+                    list: home.library,
                     resolveFor: viewModel.resolveFor,
-                    list: data.library,
+                    homeState: viewModel.state,
                   ),
                   const SizedBox(height: 16),
                   const SectionHeader(
@@ -115,9 +118,9 @@ class _HomeViewState extends State<HomeView> {
                     subtitle: 'Our store has more than 390+ books.',
                   ),
                   HorizontalBooksList(
-                    byBookId: viewModel.byBookId,
+                    list: home.explore,
                     resolveFor: viewModel.resolveFor,
-                    list: data.explore,
+                    homeState: viewModel.state,
                     showStars: false,
                     showPercentage: false,
                   ),
@@ -125,6 +128,7 @@ class _HomeViewState extends State<HomeView> {
                 ],
               );
             }
+
             return const SizedBox.shrink();
           },
         ),
