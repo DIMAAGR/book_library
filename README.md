@@ -163,6 +163,156 @@ Essas técnicas juntas permitem que a app escale bem mesmo com grandes listas de
 -   **Favoritos persistidos**: mantidos em `SharedPreferences`, simples e suficiente para o escopo. Futuramente pode evoluir para banco.
 -   **Estilo visual minimalista**: segui uma UI clean, com espaços em branco, cards sem sombras (bordas claras), para focar na legibilidade.
 
+## Evoluções de Arquitetura & State Management
+
+Durante o desenvolvimento, foram feitas algumas adições importantes para tornar os ViewModels mais consistentes e escaláveis.
+
+### ViewModelState
+Alterei o tipo genérico para facilitar o gerenciamento do ciclo de vida do estado em qualquer ViewModel e View.
+
+DE:
+```dart
+class ViewModelState<E, S> {
+  ViewModelState(this._success, this._error);
+  final S? _success;
+  final E? _error;
+}
+
+class InitialState<E, S> extends ViewModelState<E, S> {
+  InitialState() : super(null, null);
+}
+
+class LoadingState<E, S> extends ViewModelState<E, S> {
+  LoadingState() : super(null, null);
+}
+
+class SuccessState<E, S> extends ViewModelState<E, S> {
+  SuccessState(S success) : super(success, null);
+
+  S get success => _success!;
+}
+
+class ErrorState<E, S> extends ViewModelState<E, S> {
+  ErrorState(E error) : super(null, error);
+
+  E get error => _error!;
+}
+
+```
+PARA:
+```dart
+class ViewModelState<E, S> {
+  bool get isInitial => this is InitialState<E, S>;
+  bool get isLoading => this is LoadingState<E, S>;
+  bool get isSuccess => this is SuccessState<E, S>;
+  bool get isError   => this is ErrorState<E, S>;
+
+  S? get successOrNull => this is SuccessState<E, S> 
+      ? (this as SuccessState<E, S>).success 
+      : null;
+
+  E? get errorOrNull => this is ErrorState<E, S> 
+      ? (this as ErrorState<E, S>).error 
+      : null;
+
+  T fold<T>({
+    required T Function() onInitial,
+    required T Function() onLoading,
+    required T Function(S data) onSuccess,
+    required T Function(E failure) onError,
+  }) {
+    if (isInitial) return onInitial();
+    if (isLoading) return onLoading();
+    if (isSuccess) return onSuccess((this as SuccessState<E, S>).success);
+    return onError((this as ErrorState<E, S>).error);
+  }
+}
+
+[...]
+```
+
+
+Benefícios:
+- Clareza: estados explícitos (Initial, Loading, Success, Error).
+- UI declarativa: via fold a tela sabe exatamente como renderizar cada caso.
+- Reuso: qualquer ViewModel pode adotar sem duplicação.
+
+### StateObject
+
+Cada tela agora possui um StateObject (ex.: SearchStateObject, LibraryStateObject, HomeStateObject).
+
+Esses objetos agrupam:
+-	O estado principal (ViewModelState)
+-	Dados persistentes ou derivados (ex.: filters, query, favorites)
+-	Mapas de cache (byBookId) para informações externas
+
+Exemplo (SearchStateObject simplificado):
+```dart
+class SearchStateObject {
+  final ViewModelState<Failure, List<BookEntity>> state;
+  final SearchFilters filters;
+  final Set<String> favorites;
+  final BookInfoById byBookId;
+
+  const SearchStateObject({
+    required this.state,
+    required this.filters,
+    required this.favorites,
+    required this.byBookId,
+  });
+
+  factory SearchStateObject.initial() => SearchStateObject(
+        state: InitialState(),
+        filters: const SearchFilters(),
+        favorites: {},
+        byBookId: {},
+      );
+
+  SearchStateObject copyWith({
+    ViewModelState<Failure, List<BookEntity>>? state,
+    SearchFilters? filters,
+    Set<String>? favorites,
+    BookInfoById? byBookId,
+  }) {
+    return SearchStateObject(
+      state: state ?? this.state,
+      filters: filters ?? this.filters,
+      favorites: favorites ?? this.favorites,
+      byBookId: byBookId ?? this.byBookId,
+    );
+  }
+}
+```
+Isso garante **Single Source of Truth** por tela.
+
+### BaseViewModel
+
+Todos os ViewModels agora herdam de BaseViewModel, que fornece:
+- emit(UiEvent) -> disparar eventos efêmeros (snackbars, navegação)
+- isDisposed -> previne setState após o dispose
+- Lifecycle unificado para limpar recursos (dispose)
+
+Exemplo no FavoritesViewModel:
+```dart
+class FavoritesViewModel extends BaseViewModel {
+  final ValueNotifier<FavoritesStateObject> state =
+      ValueNotifier(FavoritesStateObject.initial());
+
+  Future<void> init() async {
+    state.value = state.value.copyWith(state: LoadingState());
+    final favs = await getFavoritesIds();
+    favs.fold(
+      (f) => emit(ShowErrorSnackBar(f.message)),
+      (ids) => state.value = state.value.copyWith(favorites: ids),
+    );
+  }
+}
+```
+
+Com essas padronizações, a UI e VM ficam extremamente simples aumentando a Testabilidade, Escalabilidade e deixando a UI mais Declarativa, diminuindo os IFs/ELSEs.
+
+---
+
 ## Execução
 
 ``` bash

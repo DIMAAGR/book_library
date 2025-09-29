@@ -1,5 +1,6 @@
 import 'package:book_library/src/core/routes/app_routes.dart';
 import 'package:book_library/src/features/explorer/presentation/view/explorer_view.dart';
+import 'package:book_library/src/features/favorites/presentation/view/favorites_view.dart';
 import 'package:book_library/src/features/home/presentation/view/home_view.dart';
 import 'package:book_library/src/features/launcher/presentation/view/launcher_view.dart';
 import 'package:book_library/src/features/library/presentation/view/library_view.dart';
@@ -42,6 +43,11 @@ GoRouter buildRouter() {
         path: AppRoutes.explore,
         name: AppRoutes.explore,
         pageBuilder: (context, state) => NoTransitionPage(child: ExploreView(viewModel: getIt())),
+      ),
+      GoRoute(
+        path: AppRoutes.saved,
+        name: AppRoutes.saved,
+        pageBuilder: (context, state) => NoTransitionPage(child: FavoritesView(viewModel: getIt())),
       ),
     ],
   );
