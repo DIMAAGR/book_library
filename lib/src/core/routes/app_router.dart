@@ -1,4 +1,5 @@
 import 'package:book_library/src/core/routes/app_routes.dart';
+import 'package:book_library/src/features/explorer/presentation/view/explorer_view.dart';
 import 'package:book_library/src/features/home/presentation/view/home_view.dart';
 import 'package:book_library/src/features/launcher/presentation/view/launcher_view.dart';
 import 'package:book_library/src/features/library/presentation/view/library_view.dart';
@@ -15,17 +16,17 @@ GoRouter buildRouter() {
       GoRoute(
         name: AppRoutes.launcher,
         path: '/',
-        builder: (context, state) => LauncherView(viewModel: getIt()),
+        pageBuilder: (context, state) => NoTransitionPage(child: LauncherView(viewModel: getIt())),
       ),
       GoRoute(
         name: AppRoutes.onboard,
-        path: '/onboard',
+        path: AppRoutes.onboard,
         builder: (context, state) => OnboardView(viewModel: getIt()),
       ),
       GoRoute(
         name: AppRoutes.home,
-        path: '/home',
-        builder: (context, state) => HomeView(viewModel: getIt()),
+        path: AppRoutes.home,
+        pageBuilder: (context, state) => NoTransitionPage(child: HomeView(viewModel: getIt())),
       ),
       GoRoute(
         path: AppRoutes.library,
@@ -36,6 +37,11 @@ GoRouter buildRouter() {
         name: AppRoutes.search,
         path: AppRoutes.search,
         builder: (context, state) => SearchView(viewModel: getIt()),
+      ),
+      GoRoute(
+        path: AppRoutes.explore,
+        name: AppRoutes.explore,
+        pageBuilder: (context, state) => NoTransitionPage(child: ExploreView(viewModel: getIt())),
       ),
     ],
   );

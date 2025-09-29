@@ -28,6 +28,7 @@ import 'package:book_library/src/features/books_details/domain/entites/external_
 import 'package:book_library/src/features/books_details/domain/repositories/book_details_repository.dart';
 import 'package:book_library/src/features/books_details/domain/use_cases/get_book_details_use_case.dart';
 import 'package:book_library/src/features/books_details/services/external_book_info_resolver.dart';
+import 'package:book_library/src/features/explorer/presentation/view_model/explorer_view_model.dart';
 import 'package:book_library/src/features/favorites/data/datasource/favorites_local_data_source.dart';
 import 'package:book_library/src/features/favorites/data/datasource/favorites_local_data_source_impl.dart';
 import 'package:book_library/src/features/favorites/data/repository/favorites_repository_impl.dart';
@@ -102,15 +103,20 @@ Future<void> setupInjector() async {
   /// ----------------Home-------------------
   getIt.registerLazySingleton<HomeViewModel>(() => HomeViewModel(getIt(), getIt(), getIt()));
 
-  /// ----------------Library-----------------
-  getIt.registerLazySingleton<LibraryViewModel>(() => LibraryViewModel(getIt(), getIt(), getIt()));
+  /// ----------------Library----------------
+  getIt.registerFactory<LibraryViewModel>(() => LibraryViewModel(getIt(), getIt(), getIt()));
 
   /// ----------------Search-----------------
   getIt.registerFactory<SearchViewModel>(
     () => SearchViewModel(getIt(), getIt(), getIt(), getIt(), getIt()),
   );
 
-  /// --------------Use Cases-----------------
+  /// --------------Explorer-----------------
+  getIt.registerFactory<ExploreViewModel>(
+    () => ExploreViewModel(getIt(), getIt(), getIt(), getIt()),
+  );
+
+  /// --------------Use Cases----------------
   getIt.registerLazySingleton<GetAllBooksUseCase>(() => GetAllBooksUseCaseImpl(getIt()));
   getIt.registerLazySingleton<GetCategoriesUseCase>(() => GetCategoriesUseCaseImpl(getIt()));
   getIt.registerLazySingleton<GetBookDetailsUseCase>(() => GetBookDetailsUseCaseImpl(getIt()));

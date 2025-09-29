@@ -64,63 +64,61 @@ class _SearchViewState extends State<SearchView> {
         sort: viewModel.sort,
       ),
       backgroundColor: c.background,
-      body: Expanded(
-        child: ValueListenableBuilder<ViewModelState<dynamic, List<BookEntity>>>(
-          valueListenable: viewModel.state,
-          builder: (_, st, __) {
-            if (st is LoadingState) {
-              return const CustomScrollView(
-                slivers: [
-                  SliverToBoxAdapter(child: SizedBox(height: 8)),
-                  SearchSkeletonSliverList(count: 10),
-                ],
-              );
-            }
+      body: ValueListenableBuilder<ViewModelState<dynamic, List<BookEntity>>>(
+        valueListenable: viewModel.state,
+        builder: (_, st, __) {
+          if (st is LoadingState) {
+            return const CustomScrollView(
+              slivers: [
+                SliverToBoxAdapter(child: SizedBox(height: 8)),
+                SearchSkeletonSliverList(count: 10),
+              ],
+            );
+          }
 
-            if (st is ErrorState) {
-              return OfflineView(
-                onRetry: () {
-                  viewModel.init();
-                },
-                onOpenSettings: () {},
-              );
-            }
+          if (st is ErrorState) {
+            return OfflineView(
+              onRetry: () {
+                viewModel.init();
+              },
+              onOpenSettings: () {},
+            );
+          }
 
-            if (st is SuccessState<dynamic, List<BookEntity>>) {
-              final items = st.success;
+          if (st is SuccessState<dynamic, List<BookEntity>>) {
+            final items = st.success;
 
-              return CustomScrollView(
-                slivers: [
-                  if (items.isEmpty) ...[
-                    const SliverToBoxAdapter(child: SizedBox(height: 64)),
-                    const SliverToBoxAdapter(
-                      child: Center(
-                        child: Column(
-                          children: [
-                            Icon(Icons.search_off_rounded, size: 56),
-                            SizedBox(height: 8),
-                            Text('No books match your filters'),
-                          ],
-                        ),
+            return CustomScrollView(
+              slivers: [
+                if (items.isEmpty) ...[
+                  const SliverToBoxAdapter(child: SizedBox(height: 64)),
+                  const SliverToBoxAdapter(
+                    child: Center(
+                      child: Column(
+                        children: [
+                          Icon(Icons.search_off_rounded, size: 56),
+                          SizedBox(height: 8),
+                          Text('No books match your filters'),
+                        ],
                       ),
                     ),
-                    const SliverToBoxAdapter(child: SizedBox(height: 64)),
-                  ] else ...[
-                    SearchItemSliverList(
-                      hasInfoFor: viewModel.hasInfoFor,
-                      resolveFor: viewModel.resolveFor,
-                      byBookId: viewModel.byBookId,
-                      favorites: viewModel.favorites,
-                      toggleFavorite: viewModel.toggleFavorite,
-                      items: items,
-                    ),
-                  ],
+                  ),
+                  const SliverToBoxAdapter(child: SizedBox(height: 64)),
+                ] else ...[
+                  SearchItemSliverList(
+                    hasInfoFor: viewModel.hasInfoFor,
+                    resolveFor: viewModel.resolveFor,
+                    byBookId: viewModel.byBookId,
+                    favorites: viewModel.favorites,
+                    toggleFavorite: viewModel.toggleFavorite,
+                    items: items,
+                  ),
                 ],
-              );
-            }
-            return const SizedBox.shrink();
-          },
-        ),
+              ],
+            );
+          }
+          return const SizedBox.shrink();
+        },
       ),
     );
   }

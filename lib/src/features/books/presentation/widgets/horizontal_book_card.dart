@@ -13,6 +13,8 @@ class HorizontalBookCard extends StatelessWidget {
     required this.isFavorite,
     required this.onFavoriteToggle,
     this.onTap,
+    this.rank,
+    this.showRank = false,
   });
 
   final BookEntity book;
@@ -20,6 +22,9 @@ class HorizontalBookCard extends StatelessWidget {
   final bool isFavorite;
   final VoidCallback onFavoriteToggle;
   final VoidCallback? onTap;
+
+  final int? rank;
+  final bool showRank;
 
   @override
   Widget build(BuildContext context) {
@@ -39,6 +44,11 @@ class HorizontalBookCard extends StatelessWidget {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
+            if (showRank && rank != null) ...[
+              Text('#$rank', style: AppTextStyles.h6.copyWith(color: colors.textSecondary)),
+              const SizedBox(width: 12),
+            ],
+
             ClipRRect(
               borderRadius: BorderRadius.circular(12),
               child: SizedBox(
