@@ -4,6 +4,7 @@ import 'package:book_library/src/features/books/domain/entities/book_entity.dart
 import 'package:book_library/src/features/books_details/domain/entites/external_book_info_entity.dart';
 import 'package:book_library/src/features/search/domain/strategies/sort_strategy.dart';
 import 'package:book_library/src/features/search/domain/value_objects/book_query.dart';
+import 'package:book_library/src/features/search/presentation/view_model/search_state_object.dart';
 import 'package:book_library/src/features/search/presentation/view_model/search_view_model.dart';
 import 'package:dartz/dartz.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -32,65 +33,92 @@ void main() {
     vm = SearchViewModel(mockGetAll, mockGetByTitle, mockGetFavs, mockToggleFav, mockResolver);
   });
 
-  test('init: carrega favoritos e lista inicial (getAll)', () async {
-    when(mockGetFavs()).thenAnswer((_) async => const Right({'1'}));
-    when(mockGetAll()).thenAnswer((_) async => const Right([b1, b2]));
+  group('init()', () {
+    test('carrega favoritos e lista inicial via getAll', () async {
+      when(mockGetFavs()).thenAnswer((_) async => const Right({'1'}));
+      when(mockGetAll()).thenAnswer((_) async => const Right([b1, b2]));
 
-    await vm.init();
+      await vm.init();
 
-    expect(vm.favorites.value, {'1'});
-    expect(vm.state.value, isA<SuccessState>());
-    final list = (vm.state.value as SuccessState).success as List<BookEntity>;
-    expect(list.length, 2);
+      final s = vm.state.value;
+      expect(s.favorites, {'1'});
+      expect(s.state, isA<SuccessState<Failure, SearchPayload>>());
+
+      final payload = (s.state as SuccessState<Failure, SearchPayload>).success;
+      expect(payload.items, [b1, b2]);
+    });
+
+    test('erro no getAll => ErrorState + evento', () async {
+      when(mockGetFavs()).thenAnswer((_) async => const Right(<String>{}));
+      when(mockGetAll()).thenAnswer((_) async => const Left(NetworkFailure('net down')));
+
+      await vm.init();
+
+      expect(vm.state.value.state, isA<ErrorState<Failure, SearchPayload>>());
+      expect(vm.event.value, isNotNull);
+    });
   });
 
-  test('applyCurrentFilterSelection: aplica sort e range e retorna SuccessState', () async {
-    when(mockGetFavs()).thenAnswer((_) async => const Right(<String>{}));
-    when(mockGetAll()).thenAnswer((_) async => const Right([b2, b1]));
+  group('filtros', () {
+    setUp(() async {
+      when(mockGetFavs()).thenAnswer((_) async => const Right(<String>{}));
+      when(mockGetAll()).thenAnswer((_) async => const Right([b2, b1]));
+      await vm.init();
+      vm.consumeEvent();
+    });
 
-    await vm.init();
+    test('setSort aplica ordenação no sucesso atual', () async {
+      expect(vm.state.value.state, isA<SuccessState<Failure, SearchPayload>>());
 
-    vm.sort.value = const SortByAZ();
-    await vm.applyCurrentFilterSelection();
+      vm.setSort(const SortByAZ());
+      final s = vm.state.value;
+      final payload = (s.state as SuccessState<Failure, SearchPayload>).success;
 
-    expect(vm.state.value, isA<SuccessState>());
-    final list = (vm.state.value as SuccessState).success as List<BookEntity>;
-    expect(list.map((e) => e.title).toList(), ['Clean Code', 'The Pragmatic Programmer']);
+      expect(payload.items.map((e) => e.title).toList(), [
+        'Clean Code',
+        'The Pragmatic Programmer',
+      ]);
+      expect(s.filters.sort.runtimeType, SortByAZ);
+    });
+
+    test('setRange atualiza filtro e reexecuta busca (mantém Success)', () async {
+      vm.setRange(PublishedRange.recent2020plus);
+      final s = vm.state.value;
+      expect(s.filters.range, PublishedRange.recent2020plus);
+      expect(s.state, isA<SuccessState<Failure, SearchPayload>>());
+    });
+
+    test('clearAllFilterSelection reseta filtros e mantém Success', () async {
+      vm.setSort(const SortByOldest());
+      vm.setRange(PublishedRange.classicBefore2000);
+
+      await vm.clearAllFilterSelection();
+
+      final s = vm.state.value;
+      expect(s.filters.sort.runtimeType, SortByAZ);
+      expect(s.filters.range, PublishedRange.any);
+      expect(s.state, isA<SuccessState<Failure, SearchPayload>>());
+    });
   });
 
-  test('clearAllFilterSelection: reseta filtros e recarrega', () async {
-    when(mockGetFavs()).thenAnswer((_) async => const Right(<String>{}));
-    when(mockGetAll()).thenAnswer((_) async => const Right([b1]));
-
-    await vm.init();
-    vm.sort.value = const SortByOldest();
-    vm.range.value = PublishedRange.recent2020plus;
-
-    await vm.clearAllFilterSelection();
-
-    expect(vm.sort.value, isA<SortByAZ>());
-    expect(vm.range.value, PublishedRange.any);
-    expect(vm.state.value, isA<SuccessState>());
-  });
-
-  test('toggleFavorite: atualiza favorites ValueNotifier', () async {
-    when(mockGetFavs()).thenAnswer((_) async => const Right(<String>{}));
-    when(mockGetAll()).thenAnswer((_) async => const Right([b1]));
-    when(mockToggleFav('1')).thenAnswer((_) async => const Right({'1'}));
-
-    await vm.init();
-    await vm.toggleFavorite('1');
-
-    expect(vm.favorites.value, {'1'});
-    verify(mockToggleFav('1')).called(1);
-  });
-
-  test(
-    'resolveFor: usa resolver e atualiza byBookId; chamadas duplicadas coalescem pelo map',
-    () async {
+  group('toggleFavorite()', () {
+    test('atualiza favorites dentro do StateObject', () async {
       when(mockGetFavs()).thenAnswer((_) async => const Right(<String>{}));
       when(mockGetAll()).thenAnswer((_) async => const Right([b1]));
+      when(mockToggleFav('1')).thenAnswer((_) async => const Right({'1'}));
 
+      await vm.init();
+      await vm.toggleFavorite('1');
+
+      expect(vm.state.value.favorites, {'1'});
+      verify(mockToggleFav('1')).called(1);
+    });
+  });
+
+  group('resolveFor()', () {
+    test('usa resolver e popula byBookId; chamadas repetidas coalescem pelo map', () async {
+      when(mockGetFavs()).thenAnswer((_) async => const Right(<String>{}));
+      when(mockGetAll()).thenAnswer((_) async => const Right([b1]));
       when(
         mockResolver.resolve(b1.title, b1.author),
       ).thenAnswer((_) async => const ExternalBookInfoEntity(title: 'Clean Code', isbn13: '123'));
@@ -99,20 +127,28 @@ void main() {
       await vm.resolveFor(b1);
       await vm.resolveFor(b1);
 
-      expect(vm.byBookId.value.containsKey('1'), true);
-      expect(vm.byBookId.value['1']?.isbn13, '123');
-
+      final map = vm.state.value.byBookId;
+      expect(map.containsKey('1'), true);
+      expect(map['1']?.isbn13, '123');
       verify(mockResolver.resolve(b1.title, b1.author)).called(1);
-    },
-  );
+    });
+  });
 
-  test('erro no getAll => ErrorState e ShowErrorSnackBar', () async {
-    when(mockGetFavs()).thenAnswer((_) async => const Right(<String>{}));
-    when(mockGetAll()).thenAnswer((_) async => const Left(NetworkFailure('net down')));
+  group('onTextChanged() + busca por título', () {
+    test('quando há texto, chama getByTitle e retorna Success', () async {
+      when(mockGetFavs()).thenAnswer((_) async => const Right(<String>{}));
+      when(mockGetAll()).thenAnswer((_) async => const Right([b1, b2]));
+      when(mockGetByTitle('clean')).thenAnswer((_) async => const Right([b1]));
 
-    await vm.init();
+      await vm.init();
 
-    expect(vm.state.value, isA<ErrorState>());
-    expect(vm.event.value, isNotNull);
+      vm.onTextChanged('clean');
+      await Future<void>.delayed(const Duration(milliseconds: 360));
+
+      final st = vm.state.value.state;
+      expect(st, isA<SuccessState<Failure, SearchPayload>>());
+      final items = (st as SuccessState<Failure, SearchPayload>).success.items;
+      expect(items, [b1]);
+    });
   });
 }

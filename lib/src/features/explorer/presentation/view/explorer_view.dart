@@ -40,7 +40,7 @@ class _ExploreViewState extends State<ExploreView> with SingleTickerProviderStat
 
   void _bindUiEvents() {
     _eventListener = () {
-      final event = viewModel.events.value;
+      final event = viewModel.event.value;
       if (event == null || !mounted) return;
       if (event is ShowErrorSnackBar) {
         BookLibrarySnackBars.errorSnackBar(context, event.message);
@@ -51,12 +51,12 @@ class _ExploreViewState extends State<ExploreView> with SingleTickerProviderStat
       }
       viewModel.consumeEvent();
     };
-    viewModel.events.addListener(_eventListener!);
+    viewModel.event.addListener(_eventListener!);
   }
 
   @override
   void dispose() {
-    if (_eventListener != null) viewModel.events.removeListener(_eventListener!);
+    if (_eventListener != null) viewModel.event.removeListener(_eventListener!);
     tabs.dispose();
     viewModel.dispose();
     super.dispose();

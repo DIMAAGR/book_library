@@ -10,16 +10,19 @@ class SearchAppBar extends StatelessWidget implements PreferredSizeWidget {
     super.key,
     required this.controller,
     required this.onTextChanged,
-    required this.onClear,
-    required this.onApply,
-    required this.range,
-    required this.sort,
+    required this.onApplyFilters,
+    required this.onClearFilters,
+    required this.currentRange,
+    required this.currentSort,
   });
-  final Function(String) onTextChanged;
-  final VoidCallback onClear;
-  final VoidCallback onApply;
-  final ValueNotifier<PublishedRange> range;
-  final ValueNotifier<SortStrategy> sort;
+
+  final void Function(String) onTextChanged;
+  final void Function(PublishedRange, SortStrategy) onApplyFilters;
+  final VoidCallback onClearFilters;
+
+  final PublishedRange currentRange;
+  final SortStrategy currentSort;
+
   final TextEditingController controller;
 
   @override
@@ -68,10 +71,10 @@ class SearchAppBar extends StatelessWidget implements PreferredSizeWidget {
                   isScrollControlled: true,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                   builder: (_) => SearchFilterSheet(
-                    range: range,
-                    sort: sort,
-                    onApply: onApply,
-                    onClear: onClear,
+                    initialRange: currentRange,
+                    initialSort: currentSort,
+                    onApply: onApplyFilters,
+                    onClear: onClearFilters,
                   ),
                 );
               },

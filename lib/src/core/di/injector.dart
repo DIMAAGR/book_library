@@ -36,6 +36,7 @@ import 'package:book_library/src/features/favorites/domain/repository/favorites_
 import 'package:book_library/src/features/favorites/domain/use_cases/get_favorites_id_use_case.dart';
 import 'package:book_library/src/features/favorites/domain/use_cases/is_favorite_use_case.dart';
 import 'package:book_library/src/features/favorites/domain/use_cases/toggle_favorite_use_case.dart';
+import 'package:book_library/src/features/favorites/presentation/view_model/favorites_view_model.dart';
 import 'package:book_library/src/features/home/presentation/view_model/home_view_model.dart';
 import 'package:book_library/src/features/launcher/presentation/view_model/launcher_view_model.dart';
 import 'package:book_library/src/features/library/presentation/view_model/library_view_model.dart';
@@ -114,6 +115,11 @@ Future<void> setupInjector() async {
   /// --------------Explorer-----------------
   getIt.registerFactory<ExploreViewModel>(
     () => ExploreViewModel(getIt(), getIt(), getIt(), getIt()),
+  );
+
+  /// --------------Favorites-----------------
+  getIt.registerFactory<FavoritesViewModel>(
+    () => FavoritesViewModel(getIt(), getIt(), getIt(), getIt()),
   );
 
   /// --------------Use Cases----------------

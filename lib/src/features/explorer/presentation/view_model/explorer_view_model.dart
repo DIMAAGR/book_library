@@ -1,6 +1,7 @@
 import 'package:book_library/src/core/failures/failures.dart';
 import 'package:book_library/src/core/state/ui_event.dart';
 import 'package:book_library/src/core/state/view_model_state.dart';
+import 'package:book_library/src/core/viewmodel/base_view_model.dart';
 import 'package:book_library/src/features/books/domain/entities/book_entity.dart';
 import 'package:book_library/src/features/books/domain/strategy/picks_strategy.dart';
 import 'package:book_library/src/features/books/domain/usecases/get_all_books_use_case.dart';
@@ -13,7 +14,7 @@ import 'package:book_library/src/features/search/domain/specifications/book_spec
 import 'package:book_library/src/features/search/domain/value_objects/book_query.dart';
 import 'package:flutter/foundation.dart';
 
-class ExploreViewModel {
+class ExploreViewModel extends BaseViewModel {
   ExploreViewModel(
     this.getAllBooksUseCase,
     this.getFavoritesIdsUseCase,
@@ -33,88 +34,72 @@ class ExploreViewModel {
   final PickStrategy pickPopularBooksStrategy;
 
   final ValueNotifier<ExplorerState> stateNotifier = ValueNotifier(ExplorerState.initial());
-  final ValueNotifier<UiEvent?> eventNotifier = ValueNotifier<UiEvent?>(null);
-
-  bool _isDisposed = false;
-
   ValueListenable<ExplorerState> get state => stateNotifier;
-  ValueListenable<UiEvent?> get events => eventNotifier;
 
-  void _updateState(ExplorerState nextState) {
-    if (_isDisposed) return;
-    stateNotifier.value = nextState;
+  void _set(ExplorerState next) {
+    if (isDisposed) return;
+    stateNotifier.value = next;
   }
-
-  void _emitEvent(UiEvent event) {
-    if (_isDisposed) return;
-    eventNotifier.value = event;
-  }
-
-  void consumeEvent() => eventNotifier.value = null;
 
   Future<void> init() async {
-    _updateState(stateNotifier.value.copyWith(state: LoadingState()));
+    _set(stateNotifier.value.copyWith(state: LoadingState()));
     await _loadFavorites();
     await _loadAllBooks();
   }
 
   Future<void> _loadFavorites() async {
-    final result = await getFavoritesIdsUseCase();
-    result.fold(
-      (failure) => _emitEvent(ShowSnackBar(failure.message)),
-      (favorites) => _updateState(stateNotifier.value.copyWith(favorites: favorites)),
+    final res = await getFavoritesIdsUseCase();
+    res.fold(
+      (f) => emit(ShowSnackBar(f.message)),
+      (ids) => _set(stateNotifier.value.copyWith(favorites: ids)),
     );
   }
 
   Future<void> _loadAllBooks() async {
-    final result = await getAllBooksUseCase();
-    await result.fold(
-      (Failure failure) async {
-        _updateState(stateNotifier.value.copyWith(state: ErrorState(failure)));
-        _emitEvent(ShowErrorSnackBar(failure.message));
+    final res = await getAllBooksUseCase();
+    await res.fold(
+      (f) {
+        _set(stateNotifier.value.copyWith(state: ErrorState(f)));
+        emit(ShowErrorSnackBar(f.message));
       },
-      (List<BookEntity> allBooks) async {
-        final newReleases = pickNewReleasesStrategy.pick(allBooks);
-        final popularBooks = pickPopularBooksStrategy.pick(allBooks);
-
-        final favoriteAuthorsLower = allBooks
-            .where((book) => stateNotifier.value.favorites.contains(book.id))
-            .map((book) => book.author.toLowerCase())
+      (all) async {
+        final newReleases = pickNewReleasesStrategy.pick(all);
+        final popular = pickPopularBooksStrategy.pick(all);
+        final favAuthors = all
+            .where((b) => stateNotifier.value.favorites.contains(b.id))
+            .map((b) => b.author.toLowerCase())
             .toSet();
 
-        final similarBooks = PickSimilarToFavorites(
+        final similar = PickSimilarToFavorites(
           favoriteIds: stateNotifier.value.favorites,
-          favoriteAuthorsLower: favoriteAuthorsLower,
-        ).pick(allBooks);
+          favoriteAuthorsLower: favAuthors,
+        ).pick(all);
 
-        _updateState(
+        _set(
           stateNotifier.value.copyWith(
-            state: SuccessState(allBooks),
+            state: SuccessState<Failure, List<BookEntity>>(all),
             newReleases: newReleases,
-            popularTop10: popularBooks,
-            similarToFavorites: similarBooks,
+            popularTop10: popular,
+            similarToFavorites: similar,
           ),
         );
 
-        _prefetchCovers([...newReleases, ...popularBooks, ...similarBooks].take(20));
+        _prefetchCovers([...newReleases, ...popular, ...similar].take(20));
       },
     );
   }
 
-  Future<void> toggleFavorite(String bookId) async {
-    final res = await toggleFavoriteUseCase(bookId);
+  Future<void> toggleFavorite(String id) async {
+    final res = await toggleFavoriteUseCase(id);
     res.fold(
-      (f) => _emitEvent(ShowErrorSnackBar(f.message)),
-      (updated) => _updateState(stateNotifier.value.copyWith(favorites: updated)),
+      (f) => emit(ShowErrorSnackBar(f.message)),
+      (updated) => _set(stateNotifier.value.copyWith(favorites: updated)),
     );
   }
 
   List<BookEntity> allBooksFiltered() {
     final s = stateNotifier.value.state;
-    final all = (s is SuccessState)
-        ? ((s as SuccessState).success as List<BookEntity>)
-        : const <BookEntity>[];
-
+    final all = s.successOrNull ?? const <BookEntity>[];
     final q = stateNotifier.value.query;
 
     final spec = AllowAll()
@@ -127,30 +112,26 @@ class ExploreViewModel {
     return q.sort.sort(filtered);
   }
 
-  void updateQuery(BookQuery nextQuery) =>
-      _updateState(stateNotifier.value.copyWith(query: nextQuery));
+  void updateQuery(BookQuery next) => _set(stateNotifier.value.copyWith(query: next));
 
   Future<void> _prefetchCovers(Iterable<BookEntity> books) async {
     try {
-      for (final book in books) {
-        if (_isDisposed) return;
-        final info = await externalBookInfoResolver.resolve(book.title, book.author);
-        if (_isDisposed || info == null) continue;
-
-        final updatedBookInfoMap = Map<String, ExternalBookInfoEntity>.from(
-          stateNotifier.value.byBookId,
-        )..[book.id] = info;
-
-        _updateState(stateNotifier.value.copyWith(byBookId: updatedBookInfoMap));
+      for (final b in books) {
+        if (isDisposed) return;
+        final info = await externalBookInfoResolver.resolve(b.title, b.author);
+        if (isDisposed || info == null) continue;
+        final nextMap = Map<String, ExternalBookInfoEntity>.from(stateNotifier.value.byBookId)
+          ..[b.id] = info;
+        _set(stateNotifier.value.copyWith(byBookId: nextMap));
       }
     } catch (_) {
-      _emitEvent(ShowSnackBar('Failed to prefetch covers'));
+      emit(ShowSnackBar('Failed to prefetch covers'));
     }
   }
 
+  @override
   void dispose() {
-    _isDisposed = true;
     stateNotifier.dispose();
-    eventNotifier.dispose();
+    super.dispose();
   }
 }
