@@ -38,7 +38,6 @@ void main() {
         verify(mockWrapper.setString(StorageSchema.favoritesKey, captureAny)).captured.single
             as String;
 
-    // deve estar ordenado
     expect(captured, jsonEncode(['a', 'b']));
   });
 }

@@ -55,6 +55,26 @@ class PublisherContains extends BookSpecifications {
       q.isEmpty || normalize(b.publisher ?? '').contains(normalize(q));
 }
 
+class AuthorIn extends BookSpecifications {
+  AuthorIn(this.lowerAuthors);
+  final Set<String> lowerAuthors;
+  @override
+  bool isSatisfiedBy(BookEntity b) =>
+      lowerAuthors.isEmpty ? false : lowerAuthors.contains(b.author.toLowerCase());
+}
+
+class NotInIds extends BookSpecifications {
+  NotInIds(this.ids);
+  final Set<String> ids;
+  @override
+  bool isSatisfiedBy(BookEntity b) => !ids.contains(b.id);
+}
+
+class AllowAll extends BookSpecifications {
+  @override
+  bool isSatisfiedBy(BookEntity b) => true;
+}
+
 class PublishedInRange extends BookSpecifications {
   PublishedInRange({this.minInclusive, this.maxExclusive});
 

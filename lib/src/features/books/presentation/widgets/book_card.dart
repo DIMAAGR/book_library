@@ -16,7 +16,21 @@ class BookCard extends StatelessWidget {
     this.percentage = 50,
     this.coverAspectRatio = 3 / 4,
     this.coverHeight,
-  });
+    this.width,
+  }) : _isCompact = false;
+
+  const BookCard.compact({
+    super.key,
+    required this.book,
+    this.info,
+    this.onTap,
+    required this.showPercentage,
+    required this.showStars,
+    this.percentage = 50,
+    this.coverAspectRatio = 3 / 4,
+    this.coverHeight,
+    this.width = 160,
+  }) : _isCompact = true;
 
   final BookEntity book;
   final ExternalBookInfoEntity? info;
@@ -26,6 +40,9 @@ class BookCard extends StatelessWidget {
   final bool showStars;
   final double coverAspectRatio;
   final double? coverHeight;
+  final double? width;
+
+  final bool _isCompact;
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +53,7 @@ class BookCard extends StatelessWidget {
       borderRadius: BorderRadius.circular(16),
       onTap: onTap,
       child: Container(
-        width: 220,
+        width: width ?? 220,
         decoration: BoxDecoration(
           color: colors.surface,
           borderRadius: BorderRadius.circular(16),
@@ -88,13 +105,15 @@ class BookCard extends StatelessWidget {
               book.title,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
-              style: AppTextStyles.body1Bold,
+              style: _isCompact ? AppTextStyles.body2Bold : AppTextStyles.body1Bold,
             ),
             Text(
               book.author,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: AppTextStyles.body2Regular.copyWith(color: colors.textSecondary),
+              style: _isCompact
+                  ? AppTextStyles.body3Regular.copyWith(color: colors.textSecondary)
+                  : AppTextStyles.body2Regular.copyWith(color: colors.textSecondary),
             ),
             const SizedBox(height: 6),
             if (showStars) ...[
@@ -102,7 +121,10 @@ class BookCard extends StatelessWidget {
                 children: [
                   Icon(Icons.star_rounded, color: colors.primary, size: 16),
                   const SizedBox(width: 4),
-                  Text(info?.isbn13 != null ? '4.8' : '–', style: AppTextStyles.body2Regular),
+                  Text(
+                    info?.isbn13 != null ? '4.8' : '–',
+                    style: _isCompact ? AppTextStyles.body3Regular : AppTextStyles.body2Regular,
+                  ),
                 ],
               ),
               const SizedBox(height: 6),
@@ -120,7 +142,9 @@ class BookCard extends StatelessWidget {
               const SizedBox(height: 4),
               Text(
                 '$percentage% read',
-                style: AppTextStyles.caption.copyWith(color: colors.textSecondary),
+                style: _isCompact
+                    ? AppTextStyles.caption2.copyWith(color: colors.textSecondary)
+                    : AppTextStyles.caption.copyWith(color: colors.textSecondary),
               ),
             ],
           ],

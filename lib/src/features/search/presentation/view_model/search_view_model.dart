@@ -123,7 +123,7 @@ class SearchViewModel {
   }
 
   List<BookEntity> _applyFilters(List<BookEntity> input, SearchFilters f) {
-    BookSpecifications spec = _AllowAll();
+    BookSpecifications spec = AllowAll();
     spec = spec.and(PublishedInRange.fromEnum(f.range));
     final filtered = input.where(spec.isSatisfiedBy).toList();
     return f.sort.sort(filtered);
@@ -140,9 +140,4 @@ class SearchViewModel {
     text.dispose();
     filters.dispose();
   }
-}
-
-class _AllowAll extends BookSpecifications {
-  @override
-  bool isSatisfiedBy(BookEntity b) => true;
 }
