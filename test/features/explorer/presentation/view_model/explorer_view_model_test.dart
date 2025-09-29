@@ -84,7 +84,7 @@ void main() {
       when(getAllBooks()).thenAnswer((_) async => left(const FakeFailure('boom')));
 
       UiEvent? captured;
-      vm.events.addListener(() => captured = vm.events.value);
+      vm.event.addListener(() => captured = vm.event.value);
 
       await vm.init();
 
@@ -108,7 +108,7 @@ void main() {
       when(toggleFavorite('3')).thenAnswer((_) async => left(const FakeFailure('nope')));
 
       UiEvent? event;
-      vm.events.addListener(() => event = vm.events.value);
+      vm.event.addListener(() => event = vm.event.value);
 
       await vm.toggleFavorite('3');
 
@@ -137,7 +137,7 @@ void main() {
     });
   });
 
-  group('events', () {
+  group('event', () {
     test('falha no prefetch -> ShowSnackBar', () async {
       when(getFavorites()).thenAnswer((_) async => right(<String>{}));
       when(getAllBooks()).thenAnswer((_) async => right(books));
@@ -145,7 +145,7 @@ void main() {
       when(resolver.resolve(any, any)).thenThrow(Exception('network'));
 
       UiEvent? event;
-      vm.events.addListener(() => event = vm.events.value);
+      vm.event.addListener(() => event = vm.event.value);
 
       await vm.init();
 

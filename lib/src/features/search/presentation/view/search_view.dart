@@ -2,8 +2,7 @@ import 'package:book_library/src/core/presentation/extensions/color_ext.dart';
 import 'package:book_library/src/core/presentation/views/offiline_view.dart';
 import 'package:book_library/src/core/presentation/widgets/snackbars.dart';
 import 'package:book_library/src/core/state/ui_event.dart';
-import 'package:book_library/src/core/state/view_model_state.dart';
-import 'package:book_library/src/features/books/domain/entities/book_entity.dart';
+import 'package:book_library/src/features/search/presentation/view_model/search_state_object.dart';
 import 'package:book_library/src/features/search/presentation/view_model/search_view_model.dart';
 import 'package:book_library/src/features/search/presentation/widgets/search_app_bar.dart';
 import 'package:book_library/src/features/search/presentation/widgets/search_skeleton.dart';
@@ -19,107 +18,109 @@ class SearchView extends StatefulWidget {
 }
 
 class _SearchViewState extends State<SearchView> {
-  late final SearchViewModel viewModel = widget.viewModel;
+  late final SearchViewModel vm = widget.viewModel;
   final _controller = TextEditingController();
   VoidCallback? _eventL;
 
   @override
   void initState() {
     super.initState();
-    viewModel.init();
+    vm.init();
     _eventL = () {
-      final event = viewModel.event.value;
-      if (event == null || !mounted) return;
-
-      if (event is ShowErrorSnackBar) {
-        BookLibrarySnackBars.errorSnackBar(context, event.message);
-      } else if (event is ShowSuccessSnackBar) {
-        BookLibrarySnackBars.successSnackbar(context, event.message);
-      } else if (event is ShowSnackBar) {
-        BookLibrarySnackBars.informativeSnackBar(context, event.message);
+      final e = vm.event.value;
+      if (e == null || !mounted) return;
+      if (e is ShowErrorSnackBar) {
+        BookLibrarySnackBars.errorSnackBar(context, e.message);
+      } else if (e is ShowSuccessSnackBar) {
+        BookLibrarySnackBars.successSnackbar(context, e.message);
+      } else if (e is ShowSnackBar) {
+        BookLibrarySnackBars.informativeSnackBar(context, e.message);
       }
-      viewModel.consumeEvent();
+      vm.consumeEvent();
     };
-    viewModel.event.addListener(_eventL!);
+    vm.event.addListener(_eventL!);
   }
 
   @override
   void dispose() {
-    if (_eventL != null) viewModel.event.removeListener(_eventL!);
+    if (_eventL != null) vm.event.removeListener(_eventL!);
     _controller.dispose();
-    viewModel.dispose();
+    vm.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final c = Theme.of(context).colors;
-    return Scaffold(
-      appBar: SearchAppBar(
-        controller: _controller,
-        onTextChanged: viewModel.onTextChanged,
-        onClear: viewModel.clearAllFilterSelection,
-        onApply: viewModel.applyCurrentFilterSelection,
-        range: viewModel.range,
-        sort: viewModel.sort,
-      ),
-      backgroundColor: c.background,
-      body: ValueListenableBuilder<ViewModelState<dynamic, List<BookEntity>>>(
-        valueListenable: viewModel.state,
-        builder: (_, st, __) {
-          if (st is LoadingState) {
-            return const CustomScrollView(
+    return ValueListenableBuilder<SearchStateObject>(
+      valueListenable: vm.state,
+      builder: (_, s, __) {
+        if (_controller.text != s.text) {
+          _controller.value = TextEditingValue(
+            text: s.text,
+            selection: TextSelection.collapsed(offset: s.text.length),
+          );
+        }
+
+        return Scaffold(
+          appBar: SearchAppBar(
+            controller: _controller,
+            onTextChanged: vm.onTextChanged,
+            currentRange: s.filters.range,
+            currentSort: s.filters.sort,
+            onApplyFilters: (range, sort) {
+              vm.setRange(range);
+              vm.setSort(sort);
+            },
+            onClearFilters: vm.clearAllFilterSelection,
+          ),
+          backgroundColor: Theme.of(context).colors.background,
+          body: s.state.fold(
+            onError: (f) => OfflineView(onRetry: vm.init, onOpenSettings: () {}),
+            onInitial: () =>
+                const CustomScrollView(slivers: [SliverToBoxAdapter(child: SizedBox(height: 8))]),
+            onLoading: () => const CustomScrollView(
               slivers: [
                 SliverToBoxAdapter(child: SizedBox(height: 8)),
                 SearchSkeletonSliverList(count: 10),
               ],
-            );
-          }
-
-          if (st is ErrorState) {
-            return OfflineView(
-              onRetry: () {
-                viewModel.init();
-              },
-              onOpenSettings: () {},
-            );
-          }
-
-          if (st is SuccessState<dynamic, List<BookEntity>>) {
-            final items = st.success;
-
-            return CustomScrollView(
-              slivers: [
-                if (items.isEmpty) ...[
-                  const SliverToBoxAdapter(child: SizedBox(height: 64)),
-                  const SliverToBoxAdapter(
-                    child: Center(
-                      child: Column(
-                        children: [
-                          Icon(Icons.search_off_rounded, size: 56),
-                          SizedBox(height: 8),
-                          Text('No books match your filters'),
-                        ],
+            ),
+            onSuccess: (payload) {
+              final items = payload.items;
+              if (items.isEmpty) {
+                return const CustomScrollView(
+                  slivers: [
+                    SliverToBoxAdapter(child: SizedBox(height: 64)),
+                    SliverToBoxAdapter(
+                      child: Center(
+                        child: Column(
+                          children: [
+                            Icon(Icons.search_off_rounded, size: 56),
+                            SizedBox(height: 8),
+                            Text('No books match your filters'),
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                  const SliverToBoxAdapter(child: SizedBox(height: 64)),
-                ] else ...[
+                    SliverToBoxAdapter(child: SizedBox(height: 64)),
+                  ],
+                );
+              }
+              return CustomScrollView(
+                slivers: [
                   SearchItemSliverList(
-                    hasInfoFor: viewModel.hasInfoFor,
-                    resolveFor: viewModel.resolveFor,
-                    byBookId: viewModel.byBookId,
-                    favorites: viewModel.favorites,
-                    toggleFavorite: viewModel.toggleFavorite,
+                    hasInfoFor: vm.hasInfoFor,
+                    resolveFor: vm.resolveFor,
+                    byBookId: ValueNotifier(s.byBookId),
+                    favorites: ValueNotifier(s.favorites),
+                    toggleFavorite: vm.toggleFavorite,
                     items: items,
                   ),
                 ],
-              ],
-            );
-          }
-          return const SizedBox.shrink();
-        },
-      ),
+              );
+            },
+          ),
+        );
+      },
     );
   }
 }

@@ -6,19 +6,27 @@ import 'package:book_library/src/features/search/domain/value_objects/book_query
 import 'package:book_library/src/features/search/presentation/widgets/filter_choice_chip.dart';
 import 'package:flutter/material.dart';
 
-class SearchFilterSheet extends StatelessWidget {
+class SearchFilterSheet extends StatefulWidget {
   const SearchFilterSheet({
     super.key,
-    required this.range,
-    required this.sort,
+    required this.initialRange,
+    required this.initialSort,
     required this.onApply,
     required this.onClear,
   });
 
-  final ValueNotifier<PublishedRange> range;
-  final ValueNotifier<SortStrategy> sort;
-  final VoidCallback onApply;
+  final PublishedRange initialRange;
+  final SortStrategy initialSort;
+  final void Function(PublishedRange, SortStrategy) onApply;
   final VoidCallback onClear;
+
+  @override
+  State<SearchFilterSheet> createState() => _SearchFilterSheetState();
+}
+
+class _SearchFilterSheetState extends State<SearchFilterSheet> {
+  late PublishedRange _range = widget.initialRange;
+  late SortStrategy _sort = widget.initialSort;
 
   bool _sameType(SortStrategy a, SortStrategy b) => a.runtimeType == b.runtimeType;
 
@@ -38,53 +46,47 @@ class SearchFilterSheet extends StatelessWidget {
 
             Text('Sort by', style: AppTextStyles.body1Bold),
             const SizedBox(height: 8),
-            ValueListenableBuilder<SortStrategy>(
-              valueListenable: sort,
-              builder: (_, current, __) => Wrap(
-                children: [
-                  FilterChoiceChip(
-                    label: 'A–Z',
-                    selected: _sameType(current, const SortByAZ()),
-                    onTap: () => sort.value = const SortByAZ(),
-                  ),
-                  FilterChoiceChip(
-                    label: 'Newest',
-                    selected: _sameType(current, const SortByNewest()),
-                    onTap: () => sort.value = const SortByNewest(),
-                  ),
-                  FilterChoiceChip(
-                    label: 'Oldest',
-                    selected: _sameType(current, const SortByOldest()),
-                    onTap: () => sort.value = const SortByOldest(),
-                  ),
-                ],
-              ),
+            Wrap(
+              children: [
+                FilterChoiceChip(
+                  label: 'A–Z',
+                  selected: _sameType(_sort, const SortByAZ()),
+                  onTap: () => setState(() => _sort = const SortByAZ()),
+                ),
+                FilterChoiceChip(
+                  label: 'Newest',
+                  selected: _sameType(_sort, const SortByNewest()),
+                  onTap: () => setState(() => _sort = const SortByNewest()),
+                ),
+                FilterChoiceChip(
+                  label: 'Oldest',
+                  selected: _sameType(_sort, const SortByOldest()),
+                  onTap: () => setState(() => _sort = const SortByOldest()),
+                ),
+              ],
             ),
 
             const SizedBox(height: 12),
             Text('Year published', style: AppTextStyles.body1Bold),
             const SizedBox(height: 8),
-            ValueListenableBuilder<PublishedRange>(
-              valueListenable: range,
-              builder: (_, current, __) => Wrap(
-                children: [
-                  FilterChoiceChip(
-                    label: 'Any',
-                    selected: current == PublishedRange.any,
-                    onTap: () => range.value = PublishedRange.any,
-                  ),
-                  FilterChoiceChip(
-                    label: 'Recent (2020+)',
-                    selected: current == PublishedRange.recent2020plus,
-                    onTap: () => range.value = PublishedRange.recent2020plus,
-                  ),
-                  FilterChoiceChip(
-                    label: 'Classic (< 2000)',
-                    selected: current == PublishedRange.classicBefore2000,
-                    onTap: () => range.value = PublishedRange.classicBefore2000,
-                  ),
-                ],
-              ),
+            Wrap(
+              children: [
+                FilterChoiceChip(
+                  label: 'Any',
+                  selected: _range == PublishedRange.any,
+                  onTap: () => setState(() => _range = PublishedRange.any),
+                ),
+                FilterChoiceChip(
+                  label: 'Recent (2020+)',
+                  selected: _range == PublishedRange.recent2020plus,
+                  onTap: () => setState(() => _range = PublishedRange.recent2020plus),
+                ),
+                FilterChoiceChip(
+                  label: 'Classic (< 2000)',
+                  selected: _range == PublishedRange.classicBefore2000,
+                  onTap: () => setState(() => _range = PublishedRange.classicBefore2000),
+                ),
+              ],
             ),
 
             const SizedBox(height: 16),
@@ -92,7 +94,7 @@ class SearchFilterSheet extends StatelessWidget {
               text: 'Apply filters',
               textStyle: AppTextStyles.subtitle1Medium.copyWith(color: colors.textLight),
               onPressed: () {
-                onApply();
+                widget.onApply(_range, _sort);
                 Navigator.of(context).maybePop();
               },
             ),
@@ -100,7 +102,7 @@ class SearchFilterSheet extends StatelessWidget {
             Center(
               child: TextButton(
                 onPressed: () {
-                  onClear();
+                  widget.onClear();
                   Navigator.of(context).maybePop();
                 },
                 child: const Text('Clear all'),

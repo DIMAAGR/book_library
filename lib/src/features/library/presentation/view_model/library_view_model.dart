@@ -1,6 +1,7 @@
 import 'package:book_library/src/core/failures/failures.dart';
 import 'package:book_library/src/core/state/ui_event.dart';
 import 'package:book_library/src/core/state/view_model_state.dart';
+import 'package:book_library/src/core/viewmodel/base_view_model.dart';
 import 'package:book_library/src/features/books/domain/entities/book_entity.dart';
 import 'package:book_library/src/features/books/domain/usecases/get_all_books_use_case.dart';
 import 'package:book_library/src/features/books/domain/usecases/get_categories_use_case.dart';
@@ -9,7 +10,7 @@ import 'package:book_library/src/features/books_details/services/external_book_i
 import 'package:book_library/src/features/library/presentation/view_model/library_state_object.dart';
 import 'package:flutter/foundation.dart';
 
-class LibraryViewModel {
+class LibraryViewModel extends BaseViewModel {
   LibraryViewModel(this._getBooks, this._getCategories, this._resolver);
 
   final GetAllBooksUseCase _getBooks;
@@ -22,38 +23,32 @@ class LibraryViewModel {
   // Juntar tudo em um único objeto facilita o gerenciamento do estado.
   // O Equatable ajuda a comparar instâncias e otimizar atualizações de UI.
   // Acho que vale a pena manter esse padrão... pelo menos nesse projeto.
-  final ValueNotifier<LibraryStateObject> state = ValueNotifier<LibraryStateObject>(
-    LibraryStateObject.initial(),
-  );
-
-  final ValueNotifier<UiEvent?> event = ValueNotifier<UiEvent?>(null);
+  final ValueNotifier<LibraryStateObject> state = ValueNotifier(LibraryStateObject.initial());
 
   Future<void> load() async {
     state.value = state.value.copyWith(state: LoadingState());
 
-    final catsEither = await _getCategories();
-    await catsEither.fold(
+    final cats = await _getCategories();
+    await cats.fold(
       (f) {
         state.value = state.value.copyWith(state: ErrorState(f));
-        event.value = ShowErrorSnackBar(f.message);
+        emit(ShowErrorSnackBar(f.message));
       },
-      (cats) async {
-        final booksEither = await _getBooks();
-        booksEither.fold(
+      (c) async {
+        final books = await _getBooks();
+        books.fold(
           (f) {
             state.value = state.value.copyWith(state: ErrorState(f));
-            event.value = ShowErrorSnackBar(f.message);
+            emit(ShowErrorSnackBar(f.message));
           },
-          (books) {
+          (list) {
             final payload = LibraryPayload(
-              categories: cats,
-              items: books,
-              activeCategoryId: cats.isNotEmpty ? cats.first.id : null,
+              categories: c,
+              items: list,
+              activeCategoryId: c.isNotEmpty ? c.first.id : null,
             );
-
             state.value = state.value.copyWith(state: SuccessState(payload));
-
-            _prefetchFor(books.take(8));
+            _prefetchFor(list.take(8));
           },
         );
       },
@@ -61,28 +56,23 @@ class LibraryViewModel {
   }
 
   void selectCategory(String id) {
-    final current = state.value.state;
-    if (current is! SuccessState<Failure, LibraryPayload>) return;
+    final s = state.value.state;
+    if (s is! SuccessState<Failure, LibraryPayload>) return;
 
-    final payload = current.success;
+    final payload = s.success;
     if (payload.activeCategoryId == id) return;
 
-    final updatedPayload = payload.copyWith(activeCategoryId: id);
-    state.value = state.value.copyWith(state: SuccessState(updatedPayload));
-
-    _prefetchFor(updatedPayload.items.take(8));
+    final updated = payload.copyWith(activeCategoryId: id);
+    state.value = state.value.copyWith(state: SuccessState(updated));
+    _prefetchFor(updated.items.take(8));
   }
 
   Future<void> resolveFor(BookEntity book) async {
     if (state.value.byBookId.containsKey(book.id)) return;
-
     final info = await _resolver.resolve(book.title, book.author);
     if (info == null) return;
-
-    final nextMap = Map<String, ExternalBookInfoEntity>.from(state.value.byBookId)
-      ..[book.id] = info;
-
-    state.value = state.value.copyWith(byBookId: nextMap);
+    final next = Map<String, ExternalBookInfoEntity>.from(state.value.byBookId)..[book.id] = info;
+    state.value = state.value.copyWith(byBookId: next);
   }
 
   Future<void> _prefetchFor(Iterable<BookEntity> books) async {
@@ -90,5 +80,9 @@ class LibraryViewModel {
     await _resolver.prefetch(pairs);
   }
 
-  void consumeEvent() => event.value = null;
+  @override
+  void dispose() {
+    state.dispose();
+    super.dispose();
+  }
 }
