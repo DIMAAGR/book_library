@@ -1,13 +1,14 @@
 import 'dart:async';
 
 import 'package:book_library/src/core/presentation/extensions/color_ext.dart';
-import 'package:book_library/src/core/presentation/views/offiline_view.dart';
+import 'package:book_library/src/core/presentation/views/offline_view.dart';
 import 'package:book_library/src/core/presentation/widgets/book_library_app_bar.dart';
 import 'package:book_library/src/core/presentation/widgets/book_library_button.dart';
+import 'package:book_library/src/core/routes/app_routes.dart';
 import 'package:book_library/src/core/theme/app_text_styles.dart';
 import 'package:book_library/src/features/books/domain/entities/book_entity.dart';
 import 'package:book_library/src/features/books/presentation/widgets/book_card.dart';
-import 'package:book_library/src/features/books_details/domain/entites/external_book_info_entity.dart';
+import 'package:book_library/src/features/books_details/domain/entities/external_book_info_entity.dart';
 import 'package:book_library/src/features/books_details/presentation/view_model/books_details_state_object.dart';
 import 'package:book_library/src/features/books_details/presentation/view_model/books_details_view_model.dart';
 import 'package:book_library/src/features/books_details/presentation/widgets/book_details_skeleton.dart';
@@ -15,6 +16,7 @@ import 'package:book_library/src/features/books_details/presentation/widgets/inf
 import 'package:book_library/src/features/books_details/presentation/widgets/like_button.dart';
 import 'package:book_library/src/features/books_details/presentation/widgets/rating_block.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class BookDetailsView extends StatefulWidget {
   const BookDetailsView({super.key, required this.viewModel, required this.book});
@@ -31,7 +33,9 @@ class _BookDetailsViewState extends State<BookDetailsView> {
   @override
   void initState() {
     super.initState();
-    viewModel.init(widget.book);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      viewModel.init(widget.book);
+    });
   }
 
   @override
@@ -131,7 +135,10 @@ class _BookDetailsViewState extends State<BookDetailsView> {
                         Expanded(
                           child: BookLibraryButton(
                             borderRadius: BorderRadius.circular(12),
-                            onPressed: viewModel.toggleReading,
+                            onPressed: () {
+                              !state.isReading ? viewModel.toggleReading() : null;
+                              context.pushNamed(AppRoutes.readBook, extra: book);
+                            },
                             text: state.isReading ? 'Continue Reading' : 'Start Reading',
                             textStyle: AppTextStyles.subtitle1Medium.copyWith(
                               color: colors.textLight,

@@ -1,6 +1,8 @@
 import 'package:book_library/src/core/services/cache/cache.dart';
 import 'package:book_library/src/core/services/coalescing/inflight_coalescer.dart';
 import 'package:book_library/src/core/services/concurrency/concurrency_limiter.dart';
+import 'package:book_library/src/core/services/reader/reader_content_service.dart';
+import 'package:book_library/src/core/services/reader/reader_progress_service.dart';
 import 'package:book_library/src/core/services/share/share_services.dart';
 import 'package:book_library/src/core/storage/wrapper/shared_preferences_wrapper.dart';
 import 'package:book_library/src/features/books/data/datasources/books_remote_data_source/books_remote_data_source.dart';
@@ -30,6 +32,11 @@ import 'package:book_library/src/features/onboard/domain/repository/onboard_repo
 import 'package:book_library/src/features/onboard/domain/use_cases/get_onboarding_done_use_case.dart';
 import 'package:book_library/src/features/onboard/domain/use_cases/set_onboarding_done_use_case.dart';
 import 'package:book_library/src/features/onboard/presentation/services/onboard_content_provider.dart';
+import 'package:book_library/src/features/reader/data/datasource/reader_local_data_source.dart';
+import 'package:book_library/src/features/reader/domain/repository/reader_repository.dart';
+import 'package:book_library/src/features/reader/domain/services/page_estimator.dart';
+import 'package:book_library/src/features/reader/domain/use_cases/get_reader_settings_use_case.dart';
+import 'package:book_library/src/features/reader/domain/use_cases/write_reader_settings_use_case.dart';
 import 'package:dio/dio.dart';
 import 'package:mockito/annotations.dart';
 
@@ -67,5 +74,12 @@ import 'package:mockito/annotations.dart';
   ToggleReadingUseCase,
   GetProgressUseCase,
   SetProgressUseCase,
+  ReaderSettingsRepository,
+  ReaderSettingsLocalDataSource,
+  GetReaderSettingsUseCase,
+  SetReaderSettingsUseCase,
+  PageEstimator,
+  ReaderContentService,
+  ReaderProgressService,
 ])
 void main() {}

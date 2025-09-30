@@ -1,7 +1,7 @@
 import 'package:book_library/src/core/failures/failures.dart';
 import 'package:book_library/src/core/state/view_model_state.dart';
 import 'package:book_library/src/features/books/domain/entities/book_entity.dart';
-import 'package:book_library/src/features/books_details/domain/entites/external_book_info_entity.dart';
+import 'package:book_library/src/features/books_details/domain/entities/external_book_info_entity.dart';
 import 'package:book_library/src/features/search/domain/strategies/sort_strategy.dart';
 import 'package:equatable/equatable.dart';
 

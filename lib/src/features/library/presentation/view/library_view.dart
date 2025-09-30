@@ -1,5 +1,5 @@
 import 'package:book_library/src/core/presentation/extensions/color_ext.dart';
-import 'package:book_library/src/core/presentation/views/offiline_view.dart';
+import 'package:book_library/src/core/presentation/views/offline_view.dart';
 import 'package:book_library/src/core/presentation/widgets/book_library_app_bar.dart';
 import 'package:book_library/src/core/presentation/widgets/category_chips.dart';
 import 'package:book_library/src/core/presentation/widgets/snackbars.dart';
@@ -56,12 +56,7 @@ class _LibraryViewState extends State<LibraryView> {
     final colors = Theme.of(context).colors;
 
     return Scaffold(
-      appBar: const BookLibraryAppBar(
-        title: 'Library',
-        showMenu: false,
-        showSearch: true,
-        showSettings: false,
-      ),
+      appBar: const BookLibraryAppBar(title: 'Library', showSearch: true),
       body: SafeArea(
         child: ValueListenableBuilder<LibraryStateObject>(
           valueListenable: viewModel.state,
@@ -116,7 +111,7 @@ class _LibraryViewState extends State<LibraryView> {
                                       final info = st.byBookId[book.id];
 
                                       WidgetsBinding.instance.addPostFrameCallback((_) {
-                                        viewModel.resolveFor(book);
+                                        viewModel.resolveCoverIfMissing(book);
                                       });
 
                                       return BookCard(

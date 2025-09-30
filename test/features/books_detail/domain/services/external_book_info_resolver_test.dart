@@ -4,7 +4,7 @@ import 'package:book_library/src/core/failures/failures.dart';
 import 'package:book_library/src/core/services/cache/lru_cache.dart';
 import 'package:book_library/src/core/services/coalescing/inflight_coalescer.dart';
 import 'package:book_library/src/core/services/key/default_canonical_key.dart';
-import 'package:book_library/src/features/books_details/domain/entites/external_book_info_entity.dart';
+import 'package:book_library/src/features/books_details/domain/entities/external_book_info_entity.dart';
 import 'package:book_library/src/features/books_details/services/external_book_info_resolver.dart';
 import 'package:dartz/dartz.dart';
 import 'package:flutter_test/flutter_test.dart';

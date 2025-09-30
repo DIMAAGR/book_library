@@ -1,7 +1,7 @@
 import 'package:book_library/src/core/theme/app_text_styles.dart';
 import 'package:book_library/src/features/books/presentation/widgets/book_card.dart';
-import 'package:book_library/src/features/books/presentation/widgets/highligt_book_card.dart';
-import 'package:book_library/src/features/books_details/domain/entites/external_book_info_entity.dart';
+import 'package:book_library/src/features/books/presentation/widgets/highlight_book_card.dart';
+import 'package:book_library/src/features/books_details/domain/entities/external_book_info_entity.dart';
 import 'package:book_library/src/features/explorer/presentation/view_model/explorer_state.dart';
 import 'package:book_library/src/features/explorer/presentation/view_model/explorer_view_model.dart';
 import 'package:book_library/src/features/explorer/presentation/widgets/explorer_skeleton.dart';

@@ -334,3 +334,8 @@ Pipeline configurado para:
 - rodar `flutter analyze` (sem warnings)  
 - rodar `flutter test`  
 - build do app (debug)
+
+
+Feito com <3 usando o Flutter.
+
+**Notas do Autor:** Chegou um momento que meu cerebro tava fritando, eu tinha várias ideias de outras coisas para adicionar e fazer, mas chega! kkkkkkkkkk

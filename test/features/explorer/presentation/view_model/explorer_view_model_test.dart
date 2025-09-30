@@ -3,7 +3,7 @@ import 'package:book_library/src/core/state/ui_event.dart';
 import 'package:book_library/src/core/state/view_model_state.dart';
 import 'package:book_library/src/features/books/domain/entities/book_entity.dart';
 import 'package:book_library/src/features/books/domain/strategy/picks_strategy.dart';
-import 'package:book_library/src/features/books_details/domain/entites/external_book_info_entity.dart';
+import 'package:book_library/src/features/books_details/domain/entities/external_book_info_entity.dart';
 import 'package:book_library/src/features/explorer/presentation/view_model/explorer_state.dart';
 import 'package:book_library/src/features/explorer/presentation/view_model/explorer_view_model.dart';
 import 'package:book_library/src/features/search/domain/strategies/sort_strategy.dart';
@@ -49,6 +49,10 @@ void main() {
       newReleasesStrategy: pickNewReleases,
       popularBooksStrategy: pickPopular,
     );
+
+    when(
+      resolver.resolve(any, any),
+    ).thenAnswer((_) async => const ExternalBookInfoEntity(title: 't', coverUrl: 'u'));
   });
 
   tearDown(() {
@@ -56,12 +60,13 @@ void main() {
   });
 
   group('init()', () {
-    test('carrega favoritos + livros e monta seções -> SuccessState', () async {
+    test('carrega favoritos + livros, monta seções e preenche byBookId (SuccessState)', () async {
       when(getFavorites()).thenAnswer((_) async => right({'1'}));
       when(getAllBooks()).thenAnswer((_) async => right(books));
+
       when(
         resolver.resolve(any, any),
-      ).thenAnswer((_) async => const ExternalBookInfoEntity(title: 'cover'));
+      ).thenAnswer((_) async => const ExternalBookInfoEntity(title: 'cover', coverUrl: 'u'));
 
       await vm.init();
 
@@ -71,10 +76,10 @@ void main() {
       expect(s.favorites, {'1'});
 
       expect(s.newReleases.map((b) => b.id).toList(), ['1', '2', '4', '3']);
-
       expect(s.popularTop10.map((b) => b.title).toList(), ['Alpha', 'Beta', 'Delta', 'Gamma']);
-
       expect(s.similarToFavorites.any((b) => b.id == '2'), isTrue);
+
+      expect(s.byBookId.isNotEmpty, true);
 
       verify(resolver.resolve(any, any)).called(greaterThan(0));
     });
@@ -130,6 +135,25 @@ void main() {
       expect(result.map((b) => b.title).toList(), ['Gamma', 'Delta', 'Beta', 'Alpha']);
     });
 
+    test('updateQuery dispara prefetch para os itens filtrados (commita byBookId)', () async {
+      when(
+        resolver.resolve(any, any),
+      ).thenAnswer((_) async => const ExternalBookInfoEntity(title: 't', coverUrl: 'u'));
+
+      vm.stateNotifier.value = vm.state.value.copyWith(
+        state: SuccessState<Failure, List<BookEntity>>(books),
+      );
+
+      vm.updateQuery(const BookQuery(title: '', sort: SortByAZ()));
+
+      await Future<void>.delayed(const Duration(milliseconds: 10));
+
+      final byId = vm.state.value.byBookId;
+      expect(byId.length, greaterThan(0));
+
+      verify(resolver.resolve(any, any)).called(greaterThan(0));
+    });
+
     test('quando estado não é Success, retorna lista vazia', () {
       vm.stateNotifier.value = ExplorerState.initial().copyWith(state: LoadingState());
       final r = vm.allBooksFiltered();
@@ -137,7 +161,28 @@ void main() {
     });
   });
 
-  group('event', () {
+  group('prefetch behavior', () {
+    test('não refaz resolve para livros que já têm capa em byBookId', () async {
+      when(getFavorites()).thenAnswer((_) async => right(<String>{}));
+      when(getAllBooks()).thenAnswer((_) async => right(books));
+
+      when(
+        resolver.resolve(any, any),
+      ).thenAnswer((_) async => const ExternalBookInfoEntity(title: 't', coverUrl: 'u'));
+
+      await vm.init();
+
+      final before = vm.state.value.byBookId.length;
+      expect(before, greaterThan(0));
+
+      clearInteractions(resolver);
+
+      vm.updateQuery(const BookQuery(title: '', sort: SortByAZ()));
+      await Future<void>.delayed(const Duration(milliseconds: 10));
+
+      verifyNever(resolver.resolve(any, any));
+    });
+
     test('falha no prefetch -> ShowSnackBar', () async {
       when(getFavorites()).thenAnswer((_) async => right(<String>{}));
       when(getAllBooks()).thenAnswer((_) async => right(books));
@@ -148,8 +193,7 @@ void main() {
       vm.event.addListener(() => event = vm.event.value);
 
       await vm.init();
-
-      await Future<void>.delayed(const Duration(milliseconds: 10));
+      await Future<void>.delayed(const Duration(milliseconds: 20));
 
       expect(event, anyOf(isA<ShowSnackBar>(), isNull));
     });

@@ -2,10 +2,11 @@ import 'package:book_library/src/core/failures/failures.dart';
 import 'package:book_library/src/core/state/ui_event.dart';
 import 'package:book_library/src/core/state/view_model_state.dart';
 import 'package:book_library/src/core/viewmodel/base_view_model.dart';
+import 'package:book_library/src/core/viewmodel/cover_prefetch_mixin.dart';
 import 'package:book_library/src/features/books/domain/entities/book_entity.dart';
 import 'package:book_library/src/features/books/domain/strategy/picks_strategy.dart';
 import 'package:book_library/src/features/books/domain/usecases/get_all_books_use_case.dart';
-import 'package:book_library/src/features/books_details/domain/entites/external_book_info_entity.dart';
+import 'package:book_library/src/features/books_details/domain/entities/external_book_info_entity.dart';
 import 'package:book_library/src/features/books_details/services/external_book_info_resolver.dart';
 import 'package:book_library/src/features/explorer/presentation/view_model/explorer_state.dart';
 import 'package:book_library/src/features/favorites/domain/use_cases/get_favorites_id_use_case.dart';
@@ -14,7 +15,7 @@ import 'package:book_library/src/features/search/domain/specifications/book_spec
 import 'package:book_library/src/features/search/domain/value_objects/book_query.dart';
 import 'package:flutter/foundation.dart';
 
-class ExploreViewModel extends BaseViewModel {
+class ExploreViewModel extends BaseViewModel with CoverPrefetchMixin {
   ExploreViewModel(
     this.getAllBooksUseCase,
     this.getFavoritesIdsUseCase,
@@ -84,7 +85,10 @@ class ExploreViewModel extends BaseViewModel {
           ),
         );
 
-        _prefetchCovers([...newReleases, ...popular, ...similar].take(20));
+        await prefetchMissingCovers([...newReleases, ...popular, ...similar], limit: 20);
+
+        final initialAll = allBooksFiltered();
+        await prefetchMissingCovers(initialAll, limit: 24);
       },
     );
   }
@@ -112,22 +116,23 @@ class ExploreViewModel extends BaseViewModel {
     return q.sort.sort(filtered);
   }
 
-  void updateQuery(BookQuery next) => _set(stateNotifier.value.copyWith(query: next));
+  void updateQuery(BookQuery next) {
+    _set(stateNotifier.value.copyWith(query: next));
 
-  Future<void> _prefetchCovers(Iterable<BookEntity> books) async {
-    try {
-      for (final b in books) {
-        if (isDisposed) return;
-        final info = await externalBookInfoResolver.resolve(b.title, b.author);
-        if (isDisposed || info == null) continue;
-        final nextMap = Map<String, ExternalBookInfoEntity>.from(stateNotifier.value.byBookId)
-          ..[b.id] = info;
-        _set(stateNotifier.value.copyWith(byBookId: nextMap));
-      }
-    } catch (_) {
-      emit(ShowSnackBar('Failed to prefetch covers'));
-    }
+    final filtered = allBooksFiltered();
+    prefetchMissingCovers(filtered, limit: 24);
   }
+
+  @override
+  Map<String, ExternalBookInfoEntity> readByBookId() => stateNotifier.value.byBookId;
+
+  @override
+  void writeByBookId(Map<String, ExternalBookInfoEntity> next) {
+    _set(stateNotifier.value.copyWith(byBookId: next));
+  }
+
+  @override
+  ExternalBookInfoResolver get coverResolver => externalBookInfoResolver;
 
   @override
   void dispose() {

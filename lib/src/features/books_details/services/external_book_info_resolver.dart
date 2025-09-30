@@ -2,7 +2,7 @@ import 'package:book_library/src/core/services/cache/cache.dart';
 import 'package:book_library/src/core/services/coalescing/inflight_coalescer.dart';
 import 'package:book_library/src/core/services/concurrency/concurrency_limiter.dart';
 import 'package:book_library/src/core/services/key/canonical_key_strategy.dart';
-import 'package:book_library/src/features/books_details/domain/entites/external_book_info_entity.dart';
+import 'package:book_library/src/features/books_details/domain/entities/external_book_info_entity.dart';
 import 'package:book_library/src/features/books_details/domain/use_cases/get_book_details_use_case.dart';
 
 class ExternalBookInfoResolver {

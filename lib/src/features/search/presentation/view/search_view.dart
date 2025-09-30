@@ -1,5 +1,5 @@
 import 'package:book_library/src/core/presentation/extensions/color_ext.dart';
-import 'package:book_library/src/core/presentation/views/offiline_view.dart';
+import 'package:book_library/src/core/presentation/views/offline_view.dart';
 import 'package:book_library/src/core/presentation/widgets/snackbars.dart';
 import 'package:book_library/src/core/state/ui_event.dart';
 import 'package:book_library/src/features/search/presentation/view_model/search_state_object.dart';
@@ -109,7 +109,7 @@ class _SearchViewState extends State<SearchView> {
                 slivers: [
                   SearchItemSliverList(
                     hasInfoFor: vm.hasInfoFor,
-                    resolveFor: vm.resolveFor,
+                    resolveFor: vm.resolveCoverIfMissing,
                     byBookId: ValueNotifier(s.byBookId),
                     favorites: ValueNotifier(s.favorites),
                     toggleFavorite: vm.toggleFavorite,

@@ -8,6 +8,8 @@ import 'package:book_library/src/core/services/concurrency/concurrency_limiter.d
 import 'package:book_library/src/core/services/concurrency/semaphore_limiter.dart';
 import 'package:book_library/src/core/services/key/canonical_key_strategy.dart';
 import 'package:book_library/src/core/services/key/default_canonical_key.dart';
+import 'package:book_library/src/core/services/reader/reader_content_service.dart';
+import 'package:book_library/src/core/services/reader/reader_progress_service.dart';
 import 'package:book_library/src/core/services/share/share_services.dart';
 import 'package:book_library/src/core/services/share/share_services_impl.dart';
 import 'package:book_library/src/core/storage/wrapper/shared_preferences_wrapper.dart';
@@ -29,7 +31,7 @@ import 'package:book_library/src/features/books_details/data/datasources/reading
 import 'package:book_library/src/features/books_details/data/datasources/reading/reading_local_data_source_impl.dart';
 import 'package:book_library/src/features/books_details/data/repositories/books_details_repository_impl.dart';
 import 'package:book_library/src/features/books_details/data/repositories/reading_repository_impl.dart';
-import 'package:book_library/src/features/books_details/domain/entites/external_book_info_entity.dart';
+import 'package:book_library/src/features/books_details/domain/entities/external_book_info_entity.dart';
 import 'package:book_library/src/features/books_details/domain/repositories/book_details_repository.dart';
 import 'package:book_library/src/features/books_details/domain/repositories/reading_repository.dart';
 import 'package:book_library/src/features/books_details/domain/use_cases/get_book_details_use_case.dart';
@@ -59,6 +61,13 @@ import 'package:book_library/src/features/onboard/domain/use_cases/get_onboardin
 import 'package:book_library/src/features/onboard/domain/use_cases/set_onboarding_done_use_case.dart';
 import 'package:book_library/src/features/onboard/presentation/services/onboard_content_provider.dart';
 import 'package:book_library/src/features/onboard/presentation/view_model/onboard_view_model.dart';
+import 'package:book_library/src/features/reader/data/datasource/reader_local_data_source.dart';
+import 'package:book_library/src/features/reader/data/datasource/reader_local_data_source_impl.dart';
+import 'package:book_library/src/features/reader/data/repository/reader_repository_impl.dart';
+import 'package:book_library/src/features/reader/domain/repository/reader_repository.dart';
+import 'package:book_library/src/features/reader/domain/use_cases/get_reader_settings_use_case.dart';
+import 'package:book_library/src/features/reader/domain/use_cases/write_reader_settings_use_case.dart';
+import 'package:book_library/src/features/reader/presentation/view_model/reader_view_model.dart';
 import 'package:book_library/src/features/search/presentation/view_model/search_view_model.dart';
 import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
@@ -66,16 +75,10 @@ import 'package:get_it/get_it.dart';
 final GetIt getIt = GetIt.instance;
 
 Future<void> setupInjector() async {
-  getIt.registerLazySingleton<KeyValueWrapper>(() => SharedPreferencesWrapper(getIt()));
   getIt.registerSingletonAsync<AppThemeController>(() => AppThemeController.init(getIt()));
 
   /// -----------Infrastructure--------------
-  getIt.registerLazySingleton<OnboardingRepository>(() => OnboardingRepositoryImpl(getIt()));
-  getIt.registerLazySingleton<BooksRepository>(() => BooksRepositoryImpl(getIt()));
-  getIt.registerLazySingleton<CategoriesRepository>(() => CategoriesRepositoryImpl(getIt()));
-  getIt.registerLazySingleton<FavoritesRepository>(() => FavoritesRepositoryImpl(getIt()));
-  getIt.registerLazySingleton<ReadingRepository>(() => ReadingRepositoryImpl(getIt()));
-
+  getIt.registerLazySingleton<KeyValueWrapper>(() => SharedPreferencesWrapper(getIt()));
   getIt.registerLazySingleton<Dio>(
     () => DioFactory.create(baseUrl: AppEnv.apiBaseUrl),
     instanceName: 'api',
@@ -85,15 +88,35 @@ Future<void> setupInjector() async {
     instanceName: 'catalog',
   );
 
+  /// ------------Repositories---------------
+  getIt.registerLazySingleton<OnboardingRepository>(() => OnboardingRepositoryImpl(getIt()));
+  getIt.registerLazySingleton<BooksRepository>(() => BooksRepositoryImpl(getIt()));
+  getIt.registerLazySingleton<CategoriesRepository>(() => CategoriesRepositoryImpl(getIt()));
+  getIt.registerLazySingleton<FavoritesRepository>(() => FavoritesRepositoryImpl(getIt()));
+  getIt.registerLazySingleton<ReadingRepository>(() => ReadingRepositoryImpl(getIt()));
+
+  getIt.registerLazySingleton<ReaderSettingsRepository>(
+    () => ReaderSettingsRepositoryImpl(getIt()),
+  );
+
+  /// ------------Data Sources---------------
+  getIt.registerLazySingleton<ReadingLocalDataSource>(() => ReadingLocalDataSourceImpl(getIt()));
+  getIt.registerLazySingleton<CategoriesFakeDataSource>(() => CategoriesFakeDataSourceImpl());
+
+  getIt.registerLazySingleton<ReaderSettingsLocalDataSource>(
+    () => ReaderSettingsLocalDataSourceImpl(getIt<KeyValueWrapper>()),
+  );
+
   getIt.registerLazySingleton<FavoritesLocalDataSource>(
     () => FavoritesLocalDataSourceImpl(getIt()),
   );
 
-  getIt.registerLazySingleton<ReadingLocalDataSource>(() => ReadingLocalDataSourceImpl(getIt()));
-  getIt.registerLazySingleton<CategoriesFakeDataSource>(() => CategoriesFakeDataSourceImpl());
-
   getIt.registerLazySingleton<OnboardingLocalDataSource>(
     () => OnboardingLocalDataSourceImpl(getIt()),
+  );
+
+  getIt.registerLazySingleton<ExternalBookInfoRepository>(
+    () => ExternalBookInfoRepositoryImpl(getIt()),
   );
 
   getIt.registerLazySingleton<BooksRemoteDataSource>(
@@ -102,9 +125,6 @@ Future<void> setupInjector() async {
 
   getIt.registerLazySingleton<ExternalCatalogRemoteDataSource>(
     () => ExternalCatalogRemoteDataSourceImpl(getIt<Dio>(instanceName: 'catalog')),
-  );
-  getIt.registerLazySingleton<ExternalBookInfoRepository>(
-    () => ExternalBookInfoRepositoryImpl(getIt()),
   );
 
   /// -------------Onboard-------------------
@@ -119,6 +139,11 @@ Future<void> setupInjector() async {
 
   /// ----------------Library----------------
   getIt.registerFactory<LibraryViewModel>(() => LibraryViewModel(getIt(), getIt(), getIt()));
+
+  /// ----------------Reader-----------------
+  getIt.registerFactory<ReaderViewModel>(
+    () => ReaderViewModel(getIt(), getIt(), getIt(), getIt(), getIt(), getIt(), getIt()),
+  );
 
   /// ----------------Search-----------------
   getIt.registerFactory<SearchViewModel>(
@@ -136,7 +161,7 @@ Future<void> setupInjector() async {
   );
 
   // -------------Book Details---------------
-  getIt.registerFactory<BookDetailsViewModel>(
+  getIt.registerLazySingleton<BookDetailsViewModel>(
     () => BookDetailsViewModel(
       getIt(),
       getIt(),
@@ -163,6 +188,12 @@ Future<void> setupInjector() async {
   getIt.registerLazySingleton<GetProgressUseCase>(() => GetProgressUseCaseImpl(getIt()));
   getIt.registerLazySingleton<SetProgressUseCase>(() => SetProgressUseCaseImpl(getIt()));
 
+  getIt.registerLazySingleton<GetReaderSettingsUseCase>(
+    () => GetReaderSettingsUseCaseImpl(getIt()),
+  );
+  getIt.registerLazySingleton<SetReaderSettingsUseCase>(
+    () => SetReaderSettingsUseCaseImpl(getIt()),
+  );
   getIt.registerLazySingleton<GetOnboardingDoneUseCase>(
     () => GetOnboardingDoneUseCaseImpl(getIt()),
   );
@@ -191,6 +222,15 @@ Future<void> setupInjector() async {
 
   // -------------- Share Service -------------------
   getIt.registerLazySingleton<ShareService>(() => ShareServiceImpl());
+
+  // -------------- READER SERVICES -------------------
+  getIt.registerLazySingleton<ReaderContentService>(() => const EpubReaderContentService());
+  getIt.registerLazySingleton<ReaderProgressService>(
+    () => DebouncedReaderProgressService(
+      save: (bookId, p) => getIt<SetProgressUseCase>()(bookId, p),
+      debounceMs: 300,
+    ),
+  );
 
   await getIt.allReady();
 }

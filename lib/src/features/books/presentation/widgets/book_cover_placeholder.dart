@@ -9,7 +9,8 @@ class BookCoverPlaceholder extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colors;
-    final highlight = colors.tapEffect.withAlpha(20);
+
+    final highlight = colors.primaryDark;
     final base = colors.tapEffect;
 
     return isNotFound
