@@ -30,7 +30,7 @@ class ForYouTab extends StatelessWidget {
             const SizedBox(height: 8),
             HighlightBookCard(
               book: explorer.newReleases[0],
-              info: explorer.byBookId[explorer.newReleases[0].id],
+              info: explorer.byBookId[explorer.newReleases[1].id],
             ),
             const SizedBox(height: 16),
             Padding(
