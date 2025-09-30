@@ -136,7 +136,6 @@ class _FavoritesViewState extends State<FavoritesView> {
                       info: info,
                       isFavorite: isFav,
                       onFavoriteToggle: () => vm.onToggleFavorite(b.id),
-                      onTap: () {},
                       showRank: false,
                     );
                   },

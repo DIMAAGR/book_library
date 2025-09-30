@@ -56,7 +56,6 @@ class SearchItemSliverList extends StatelessWidget {
                   info: info,
                   isFavorite: favs.contains(b.id),
                   onFavoriteToggle: () => toggleFavorite(b.id),
-                  onTap: () {},
                 ),
               );
             },

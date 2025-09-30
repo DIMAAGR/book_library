@@ -3,4 +3,5 @@ class StorageSchema {
   static const themeKey = 'theme_v$version';
   static const favoritesKey = 'favorites_v$version';
   static const onboardingDoneKey = 'onboarding_done_v$version';
+  static const readingKey = 'reading_v$version';
 }

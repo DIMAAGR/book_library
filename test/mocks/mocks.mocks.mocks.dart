@@ -13,6 +13,8 @@ import 'package:book_library/src/core/services/concurrency/concurrency_limiter.d
     as _i5;
 import 'package:book_library/src/core/services/key/canonical_key_strategy.dart'
     as _i7;
+import 'package:book_library/src/core/services/share/share_services.dart'
+    as _i45;
 import 'package:book_library/src/core/storage/wrapper/shared_preferences_wrapper.dart'
     as _i15;
 import 'package:book_library/src/features/books/data/datasources/books_remote_data_source/books_remote_data_source.dart'
@@ -33,14 +35,26 @@ import 'package:book_library/src/features/books/domain/usecases/get_book_by_titl
     as _i38;
 import 'package:book_library/src/features/books/domain/usecases/get_categories_use_case.dart'
     as _i25;
-import 'package:book_library/src/features/books_details/data/datasources/external_catalog_remote_data_source.dart'
+import 'package:book_library/src/features/books_details/data/datasources/external_catalog/external_catalog_remote_data_source.dart'
     as _i30;
+import 'package:book_library/src/features/books_details/data/datasources/reading/reading_local_data_source.dart'
+    as _i43;
 import 'package:book_library/src/features/books_details/domain/entites/external_book_info_entity.dart'
     as _i28;
 import 'package:book_library/src/features/books_details/domain/repositories/book_details_repository.dart'
     as _i31;
+import 'package:book_library/src/features/books_details/domain/repositories/reading_repository.dart'
+    as _i44;
 import 'package:book_library/src/features/books_details/domain/use_cases/get_book_details_use_case.dart'
     as _i3;
+import 'package:book_library/src/features/books_details/domain/use_cases/get_progress_use_case.dart'
+    as _i48;
+import 'package:book_library/src/features/books_details/domain/use_cases/is_reading_use_case.dart'
+    as _i46;
+import 'package:book_library/src/features/books_details/domain/use_cases/set_progress_use_case.dart'
+    as _i49;
+import 'package:book_library/src/features/books_details/domain/use_cases/toggle_reading_use_case.dart'
+    as _i47;
 import 'package:book_library/src/features/books_details/services/external_book_info_resolver.dart'
     as _i27;
 import 'package:book_library/src/features/favorites/data/datasource/favorites_local_data_source.dart'
@@ -1662,4 +1676,220 @@ class MockFavoritesRepository extends _i1.Mock
                 ),
           )
           as _i14.Future<_i2.Either<_i18.Failure, Set<String>>>);
+}
+
+/// A class which mocks [ReadingLocalDataSource].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockReadingLocalDataSource extends _i1.Mock
+    implements _i43.ReadingLocalDataSource {
+  MockReadingLocalDataSource() {
+    _i1.throwOnMissingStub(this);
+  }
+
+  @override
+  _i14.Future<bool> isReading(String? id) =>
+      (super.noSuchMethod(
+            Invocation.method(#isReading, [id]),
+            returnValue: _i14.Future<bool>.value(false),
+          )
+          as _i14.Future<bool>);
+
+  @override
+  _i14.Future<bool> toggleReading(String? id) =>
+      (super.noSuchMethod(
+            Invocation.method(#toggleReading, [id]),
+            returnValue: _i14.Future<bool>.value(false),
+          )
+          as _i14.Future<bool>);
+
+  @override
+  _i14.Future<int> getProgress(String? id) =>
+      (super.noSuchMethod(
+            Invocation.method(#getProgress, [id]),
+            returnValue: _i14.Future<int>.value(0),
+          )
+          as _i14.Future<int>);
+
+  @override
+  _i14.Future<void> setProgress(String? id, int? percent) =>
+      (super.noSuchMethod(
+            Invocation.method(#setProgress, [id, percent]),
+            returnValue: _i14.Future<void>.value(),
+            returnValueForMissingStub: _i14.Future<void>.value(),
+          )
+          as _i14.Future<void>);
+}
+
+/// A class which mocks [ReadingRepository].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockReadingRepository extends _i1.Mock implements _i44.ReadingRepository {
+  MockReadingRepository() {
+    _i1.throwOnMissingStub(this);
+  }
+
+  @override
+  _i14.Future<_i2.Either<_i18.Failure, bool>> isReading(String? bookId) =>
+      (super.noSuchMethod(
+            Invocation.method(#isReading, [bookId]),
+            returnValue: _i14.Future<_i2.Either<_i18.Failure, bool>>.value(
+              _FakeEither_0<_i18.Failure, bool>(
+                this,
+                Invocation.method(#isReading, [bookId]),
+              ),
+            ),
+          )
+          as _i14.Future<_i2.Either<_i18.Failure, bool>>);
+
+  @override
+  _i14.Future<_i2.Either<_i18.Failure, bool>> toggleReading(String? bookId) =>
+      (super.noSuchMethod(
+            Invocation.method(#toggleReading, [bookId]),
+            returnValue: _i14.Future<_i2.Either<_i18.Failure, bool>>.value(
+              _FakeEither_0<_i18.Failure, bool>(
+                this,
+                Invocation.method(#toggleReading, [bookId]),
+              ),
+            ),
+          )
+          as _i14.Future<_i2.Either<_i18.Failure, bool>>);
+
+  @override
+  _i14.Future<_i2.Either<_i18.Failure, int>> getProgress(String? bookId) =>
+      (super.noSuchMethod(
+            Invocation.method(#getProgress, [bookId]),
+            returnValue: _i14.Future<_i2.Either<_i18.Failure, int>>.value(
+              _FakeEither_0<_i18.Failure, int>(
+                this,
+                Invocation.method(#getProgress, [bookId]),
+              ),
+            ),
+          )
+          as _i14.Future<_i2.Either<_i18.Failure, int>>);
+
+  @override
+  _i14.Future<_i2.Either<_i18.Failure, _i2.Unit>> setProgress(
+    String? bookId,
+    int? percent,
+  ) =>
+      (super.noSuchMethod(
+            Invocation.method(#setProgress, [bookId, percent]),
+            returnValue: _i14.Future<_i2.Either<_i18.Failure, _i2.Unit>>.value(
+              _FakeEither_0<_i18.Failure, _i2.Unit>(
+                this,
+                Invocation.method(#setProgress, [bookId, percent]),
+              ),
+            ),
+          )
+          as _i14.Future<_i2.Either<_i18.Failure, _i2.Unit>>);
+}
+
+/// A class which mocks [ShareService].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockShareService extends _i1.Mock implements _i45.ShareService {
+  MockShareService() {
+    _i1.throwOnMissingStub(this);
+  }
+
+  @override
+  _i14.Future<void> shareText(String? text, {String? subject}) =>
+      (super.noSuchMethod(
+            Invocation.method(#shareText, [text], {#subject: subject}),
+            returnValue: _i14.Future<void>.value(),
+            returnValueForMissingStub: _i14.Future<void>.value(),
+          )
+          as _i14.Future<void>);
+}
+
+/// A class which mocks [IsReadingUseCase].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockIsReadingUseCase extends _i1.Mock implements _i46.IsReadingUseCase {
+  MockIsReadingUseCase() {
+    _i1.throwOnMissingStub(this);
+  }
+
+  @override
+  _i14.Future<_i2.Either<_i18.Failure, bool>> call(String? id) =>
+      (super.noSuchMethod(
+            Invocation.method(#call, [id]),
+            returnValue: _i14.Future<_i2.Either<_i18.Failure, bool>>.value(
+              _FakeEither_0<_i18.Failure, bool>(
+                this,
+                Invocation.method(#call, [id]),
+              ),
+            ),
+          )
+          as _i14.Future<_i2.Either<_i18.Failure, bool>>);
+}
+
+/// A class which mocks [ToggleReadingUseCase].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockToggleReadingUseCase extends _i1.Mock
+    implements _i47.ToggleReadingUseCase {
+  MockToggleReadingUseCase() {
+    _i1.throwOnMissingStub(this);
+  }
+
+  @override
+  _i14.Future<_i2.Either<_i18.Failure, bool>> call(String? id) =>
+      (super.noSuchMethod(
+            Invocation.method(#call, [id]),
+            returnValue: _i14.Future<_i2.Either<_i18.Failure, bool>>.value(
+              _FakeEither_0<_i18.Failure, bool>(
+                this,
+                Invocation.method(#call, [id]),
+              ),
+            ),
+          )
+          as _i14.Future<_i2.Either<_i18.Failure, bool>>);
+}
+
+/// A class which mocks [GetProgressUseCase].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockGetProgressUseCase extends _i1.Mock
+    implements _i48.GetProgressUseCase {
+  MockGetProgressUseCase() {
+    _i1.throwOnMissingStub(this);
+  }
+
+  @override
+  _i14.Future<_i2.Either<_i18.Failure, int>> call(String? id) =>
+      (super.noSuchMethod(
+            Invocation.method(#call, [id]),
+            returnValue: _i14.Future<_i2.Either<_i18.Failure, int>>.value(
+              _FakeEither_0<_i18.Failure, int>(
+                this,
+                Invocation.method(#call, [id]),
+              ),
+            ),
+          )
+          as _i14.Future<_i2.Either<_i18.Failure, int>>);
+}
+
+/// A class which mocks [SetProgressUseCase].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockSetProgressUseCase extends _i1.Mock
+    implements _i49.SetProgressUseCase {
+  MockSetProgressUseCase() {
+    _i1.throwOnMissingStub(this);
+  }
+
+  @override
+  _i14.Future<_i2.Either<_i18.Failure, _i2.Unit>> call(String? id, int? p) =>
+      (super.noSuchMethod(
+            Invocation.method(#call, [id, p]),
+            returnValue: _i14.Future<_i2.Either<_i18.Failure, _i2.Unit>>.value(
+              _FakeEither_0<_i18.Failure, _i2.Unit>(
+                this,
+                Invocation.method(#call, [id, p]),
+              ),
+            ),
+          )
+          as _i14.Future<_i2.Either<_i18.Failure, _i2.Unit>>);
 }

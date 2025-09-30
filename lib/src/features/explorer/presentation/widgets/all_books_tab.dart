@@ -67,7 +67,6 @@ class AllBooksTab extends StatelessWidget {
                   return BookCard.compact(
                     book: b,
                     info: info,
-                    onTap: () {},
                     showPercentage: false,
                     showStars: false,
                   );

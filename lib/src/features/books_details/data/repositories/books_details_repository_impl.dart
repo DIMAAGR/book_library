@@ -1,5 +1,5 @@
 import 'package:book_library/src/core/failures/failures.dart';
-import 'package:book_library/src/features/books_details/data/datasources/external_catalog_remote_data_source.dart';
+import 'package:book_library/src/features/books_details/data/datasources/external_catalog/external_catalog_remote_data_source.dart';
 import 'package:book_library/src/features/books_details/data/mappers/external_book_info_mapper.dart';
 import 'package:book_library/src/features/books_details/data/models/external_book_info_model.dart';
 import 'package:book_library/src/features/books_details/domain/entites/external_book_info_entity.dart';
