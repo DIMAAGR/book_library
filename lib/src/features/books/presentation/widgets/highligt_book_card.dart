@@ -1,13 +1,14 @@
 import 'package:book_library/src/core/presentation/extensions/color_ext.dart';
+import 'package:book_library/src/core/routes/app_routes.dart';
 import 'package:book_library/src/core/theme/app_text_styles.dart';
 import 'package:book_library/src/features/books/domain/entities/book_entity.dart';
 import 'package:book_library/src/features/books/presentation/widgets/book_cover_placeholder.dart';
 import 'package:book_library/src/features/books_details/domain/entites/external_book_info_entity.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class HighlightBookCard extends StatelessWidget {
-  const HighlightBookCard({super.key, required this.book, this.info, required this.onReadNow});
-  final VoidCallback onReadNow;
+  const HighlightBookCard({super.key, required this.book, this.info});
   final BookEntity book;
   final ExternalBookInfoEntity? info;
 
@@ -82,7 +83,9 @@ class HighlightBookCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 12),
                   ElevatedButton(
-                    onPressed: onReadNow,
+                    onPressed: () {
+                      context.pushNamed(AppRoutes.bookDetails, extra: book);
+                    },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: colors.primary,
                       elevation: 0,

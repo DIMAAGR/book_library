@@ -1,5 +1,5 @@
-import 'package:flutter/foundation.dart';
 import 'package:book_library/src/core/state/ui_event.dart';
+import 'package:flutter/foundation.dart';
 
 abstract class BaseViewModel {
   final ValueNotifier<UiEvent?> event = ValueNotifier<UiEvent?>(null);

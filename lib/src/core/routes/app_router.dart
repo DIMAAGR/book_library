@@ -1,4 +1,6 @@
 import 'package:book_library/src/core/routes/app_routes.dart';
+import 'package:book_library/src/features/books/domain/entities/book_entity.dart';
+import 'package:book_library/src/features/books_details/presentation/view/books_details_view.dart';
 import 'package:book_library/src/features/explorer/presentation/view/explorer_view.dart';
 import 'package:book_library/src/features/favorites/presentation/view/favorites_view.dart';
 import 'package:book_library/src/features/home/presentation/view/home_view.dart';
@@ -48,6 +50,15 @@ GoRouter buildRouter() {
         path: AppRoutes.saved,
         name: AppRoutes.saved,
         pageBuilder: (context, state) => NoTransitionPage(child: FavoritesView(viewModel: getIt())),
+      ),
+
+      GoRoute(
+        path: AppRoutes.bookDetails,
+        name: AppRoutes.bookDetails,
+        builder: (context, state) {
+          final book = state.extra;
+          return BookDetailsView(book: book as BookEntity, viewModel: getIt());
+        },
       ),
     ],
   );

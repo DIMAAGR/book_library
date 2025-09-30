@@ -9,15 +9,19 @@ class BookLibraryAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.showMenu = false,
     this.showSettings = false,
     this.showSearch = false,
+    this.showShare = false,
+    this.onSharePressed,
     required this.title,
     this.onMenuTap,
     this.onSettingsPressed,
   });
   final bool showMenu;
-  final VoidCallback? onMenuTap;
   final bool showSettings;
   final bool showSearch;
+  final bool showShare;
   final String title;
+  final VoidCallback? onMenuTap;
+  final VoidCallback? onSharePressed;
   final VoidCallback? onSettingsPressed;
 
   @override
@@ -44,6 +48,11 @@ class BookLibraryAppBar extends StatelessWidget implements PreferredSizeWidget {
           IconButton(
             icon: Icon(Icons.settings_rounded, color: colors.textPrimary),
             onPressed: onSettingsPressed,
+          ),
+        if (showShare)
+          IconButton(
+            icon: Icon(Icons.share_rounded, color: colors.textPrimary),
+            onPressed: onSharePressed,
           ),
         const SizedBox(width: 8),
       ],

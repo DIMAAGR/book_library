@@ -31,7 +31,6 @@ class ForYouTab extends StatelessWidget {
             HighlightBookCard(
               book: explorer.newReleases[0],
               info: explorer.byBookId[explorer.newReleases[0].id],
-              onReadNow: () {},
             ),
             const SizedBox(height: 16),
             Padding(
@@ -52,7 +51,6 @@ class ForYouTab extends StatelessWidget {
                   return BookCard.compact(
                     book: b,
                     info: info,
-                    onTap: () {},
                     showPercentage: false,
                     showStars: false,
                   );
@@ -78,7 +76,6 @@ class ForYouTab extends StatelessWidget {
                   return BookCard.compact(
                     book: b,
                     info: info,
-                    onTap: () {},
                     showPercentage: false,
                     showStars: false,
                   );

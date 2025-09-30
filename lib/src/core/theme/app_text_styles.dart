@@ -40,6 +40,9 @@ abstract class AppTextStyles {
   static TextStyle get subtitle1Medium =>
       const TextStyle(fontSize: 16, fontFamily: 'Roboto', fontWeight: FontWeight.w600);
 
+  static TextStyle get subtitle2Medium =>
+      const TextStyle(fontSize: 14, fontFamily: 'Roboto', fontWeight: FontWeight.w600);
+
   static TextStyle get caption =>
       const TextStyle(fontSize: 12, fontFamily: 'Roboto', fontWeight: FontWeight.w400);
 

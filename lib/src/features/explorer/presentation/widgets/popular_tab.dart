@@ -36,7 +36,6 @@ class PopularTab extends StatelessWidget {
               info: info,
               isFavorite: isFavorite,
               onFavoriteToggle: () => viewModel.toggleFavorite(b.id),
-              onTap: () {},
               showRank: true,
               rank: i + 1,
             );

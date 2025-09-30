@@ -40,7 +40,6 @@ class HorizontalBooksList extends StatelessWidget {
               return BookCard(
                 book: book,
                 info: info,
-                onTap: () {},
                 showPercentage: showPercentage,
                 showStars: showStars,
               );

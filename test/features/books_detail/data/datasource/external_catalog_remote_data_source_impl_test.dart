@@ -1,5 +1,5 @@
 import 'package:book_library/src/core/constants/api_paths.dart';
-import 'package:book_library/src/features/books_details/data/datasources/external_catalog_remote_data_source_impl.dart';
+import 'package:book_library/src/features/books_details/data/datasources/external_catalog/external_catalog_remote_data_source_impl.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/mockito.dart';
@@ -43,7 +43,7 @@ void main() {
             ).captured.first
             as Map<String, dynamic>;
 
-    expect(captured['q'], 'intitle:Empreendedorismo Inovador inauthor:Nei Grando');
+    expect(captured['q'], 'intitle:Empreendedorismo Inovador');
     expect(captured['maxResults'], 1);
     expect(result['kind'], 'books#volumes');
   });
