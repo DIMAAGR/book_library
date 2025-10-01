@@ -1,8 +1,8 @@
 import 'package:book_library/src/core/presentation/extensions/color_ext.dart';
+import 'package:book_library/src/core/theme/app_colors.dart';
+import 'package:book_library/src/core/theme/app_text_styles.dart';
+import 'package:book_library/src/core/theme/app_theme_mode_enum.dart';
 import 'package:flutter/material.dart';
-import 'app_colors.dart';
-import 'app_text_styles.dart';
-import 'app_theme_mode_enum.dart';
 
 abstract class AppTheme {
   static ThemeData resolve(AppThemeMode mode) {
@@ -17,7 +17,7 @@ abstract class AppTheme {
   }
 
   static ThemeData light() {
-    final colors = AppColorsLight();
+    final colors = const AppColorsLight();
     return ThemeData(
       brightness: Brightness.light,
       scaffoldBackgroundColor: colors.background,
@@ -31,12 +31,27 @@ abstract class AppTheme {
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         ),
       ),
+      bottomSheetTheme: BottomSheetThemeData(
+        backgroundColor: colors.surface,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+        ),
+      ),
+      bottomNavigationBarTheme: BottomNavigationBarThemeData(
+        backgroundColor: colors.surface,
+        selectedItemColor: colors.primary,
+        unselectedItemColor: colors.textSecondary,
+        selectedLabelStyle: AppTextStyles.captionBold,
+        unselectedLabelStyle: AppTextStyles.caption,
+        type: BottomNavigationBarType.fixed,
+      ),
       popupMenuTheme: PopupMenuThemeData(
         color: Colors.white,
         textStyle: AppTextStyles.body1Regular,
       ),
       appBarTheme: AppBarTheme(
         backgroundColor: colors.background,
+        surfaceTintColor: colors.background,
         foregroundColor: colors.textPrimary,
         elevation: 0,
         centerTitle: false,
@@ -45,7 +60,7 @@ abstract class AppTheme {
   }
 
   static ThemeData dark() {
-    final colors = AppColorsDark();
+    final colors = const AppColorsDark();
     return ThemeData(
       brightness: Brightness.dark,
       scaffoldBackgroundColor: colors.background,
@@ -58,6 +73,20 @@ abstract class AppTheme {
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         ),
+      ),
+      bottomSheetTheme: BottomSheetThemeData(
+        backgroundColor: colors.surface,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+        ),
+      ),
+      bottomNavigationBarTheme: BottomNavigationBarThemeData(
+        backgroundColor: colors.surface,
+        selectedItemColor: colors.primary,
+        unselectedItemColor: colors.textSecondary,
+        selectedLabelStyle: AppTextStyles.captionBold,
+        unselectedLabelStyle: AppTextStyles.caption,
+        type: BottomNavigationBarType.fixed,
       ),
       popupMenuTheme: PopupMenuThemeData(
         color: const Color(0xFF202020),
@@ -73,7 +102,7 @@ abstract class AppTheme {
   }
 
   static ThemeData sepia() {
-    final colors = AppColorsSepia();
+    final colors = const AppColorsSepia();
     return ThemeData(
       brightness: Brightness.light,
       scaffoldBackgroundColor: colors.background,
@@ -86,6 +115,20 @@ abstract class AppTheme {
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         ),
+      ),
+      bottomSheetTheme: BottomSheetThemeData(
+        backgroundColor: colors.surface,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+        ),
+      ),
+      bottomNavigationBarTheme: BottomNavigationBarThemeData(
+        backgroundColor: colors.surface,
+        selectedItemColor: colors.primary,
+        unselectedItemColor: colors.textSecondary,
+        selectedLabelStyle: AppTextStyles.captionBold,
+        unselectedLabelStyle: AppTextStyles.caption,
+        type: BottomNavigationBarType.fixed,
       ),
       popupMenuTheme: PopupMenuThemeData(
         color: colors.surface,

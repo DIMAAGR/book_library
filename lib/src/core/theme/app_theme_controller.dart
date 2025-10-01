@@ -5,10 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AppThemeController {
-  final SharedPreferences prefs;
-  final String key;
-  final ValueNotifier<AppThemeMode> mode = ValueNotifier(AppThemeMode.light);
-
   AppThemeController._(this.prefs, this.key, String? raw) {
     if (raw != null) {
       mode.value = AppThemeMode.values.firstWhere(
@@ -17,6 +13,9 @@ class AppThemeController {
       );
     }
   }
+  final SharedPreferences prefs;
+  final String key;
+  final ValueNotifier<AppThemeMode> mode = ValueNotifier(AppThemeMode.light);
 
   static Future<AppThemeController> init(SharedPreferences prefs) async {
     final key = StorageSchema.themeKey;

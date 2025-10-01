@@ -1,1 +1,37 @@
 include: package:flutter_lints/flutter.yaml
+
+linter:
+  rules:
+    avoid_print: true
+    prefer_const_constructors: true
+    prefer_const_literals_to_create_immutables: true
+    always_use_package_imports: true
+    directives_ordering: true
+    sort_constructors_first: true
+    use_key_in_widget_constructors: true
+    prefer_final_locals: true
+    omit_local_variable_types: false
+    prefer_single_quotes: true
+    unnecessary_late: true
+    avoid_returning_null_for_future: true
+    avoid_dynamic_calls: true
+    cancel_subscriptions: true
+    close_sinks: true
+
+dart_code_metrics:
+  extends:
+    - package:dart_code_metrics_presets/all.yaml
+  metrics:
+    cyclomatic-complexity: 15
+    lines-of-code: 120
+    maximum-nesting-level: 5
+    number-of-parameters: 4
+  metrics-exclude:
+    - test/**
+  rules:
+    - prefer-trailing-comma
+    - no-equal-then-else
+    - no-object-declaration
+    - no-boolean-literal-compare
+    - prefer-immediate-return
+    - avoid-nested-conditional-expressions

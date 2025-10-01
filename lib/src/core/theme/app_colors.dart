@@ -1,25 +1,6 @@
 import 'dart:ui';
 
 sealed class AppColors {
-  final Color primary;
-  final Color primaryLight;
-  final Color primaryDark;
-
-  final Color textPrimary;
-  final Color textSecondary;
-  final Color textLight;
-
-  final Color background;
-  final Color surface;
-  final Color border;
-
-  final Color error;
-  final Color warning;
-  final Color success;
-
-  final Color tapEffect;
-  final Color selectionEffect;
-
   const AppColors({
     required this.primary,
     required this.primaryLight,
@@ -35,7 +16,27 @@ sealed class AppColors {
     required this.success,
     required this.tapEffect,
     required this.selectionEffect,
+    required this.primaryBlack,
   });
+  final Color primary;
+  final Color primaryLight;
+  final Color primaryDark;
+  final Color primaryBlack;
+
+  final Color textPrimary;
+  final Color textSecondary;
+  final Color textLight;
+
+  final Color background;
+  final Color surface;
+  final Color border;
+
+  final Color error;
+  final Color warning;
+  final Color success;
+
+  final Color tapEffect;
+  final Color selectionEffect;
 }
 
 class AppColorsLight extends AppColors {
@@ -44,6 +45,7 @@ class AppColorsLight extends AppColors {
         primary: const Color(0xFF7C3AED),
         primaryLight: const Color(0xFF9F67F8),
         primaryDark: const Color(0xFF5B21B6),
+        primaryBlack: const Color(0xFF2E1065),
         textPrimary: const Color(0xFF111827),
         textSecondary: const Color(0xFF6B7280),
         textLight: const Color(0xFFFFFFFF),
@@ -64,6 +66,7 @@ class AppColorsDark extends AppColors {
         primary: const Color(0xFF9F67F8),
         primaryLight: const Color(0xFFB794F4),
         primaryDark: const Color(0xFF7C3AED),
+        primaryBlack: const Color(0xFFDCCEB0),
         textPrimary: const Color(0xFFF9FAFB),
         textSecondary: const Color(0xFFD1D5DB),
         textLight: const Color(0xFF111827),
@@ -84,6 +87,7 @@ class AppColorsSepia extends AppColors {
         primary: const Color(0xFF7C3AED),
         primaryLight: const Color(0xFF9F67F8),
         primaryDark: const Color(0xFF5B21B6),
+        primaryBlack: const Color(0xFF3B2F2F),
         textPrimary: const Color(0xFF5B4636),
         textSecondary: const Color(0xFF7C6F62),
         textLight: const Color(0xFFFFFFFF),
