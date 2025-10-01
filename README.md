@@ -336,6 +336,65 @@ Pipeline configurado para:
 - build do app (debug)
 
 
+## Imagens
+
+<div align="center">
+    <img src="/images/1.png" width="400px"</img> 
+    <img src="/images/2.png" width="400px"</img> 
+</div>
+<div align="center">
+    <img src="/images/3.png" width="400px"</img> 
+    <img src="/images/4.png" width="400px"</img> 
+</div>
+<div align="center">
+    <img src="/images/5.png" width="400px"</img> 
+    <img src="/images/6.png" width="400px"</img> 
+</div>
+<div align="center">
+    <img src="/images/7.png" width="400px"</img> 
+    <img src="/images/8.png" width="400px"</img> 
+</div>
+<div align="center">
+    <img src="/images/9.png" width="400px"</img> 
+    <img src="/images/10.png" width="400px"</img> 
+</div>
+<div align="center">
+    <img src="/images/11.png" width="400px"</img> 
+    <img src="/images/12.png" width="400px"</img> 
+</div>
+<div align="center">
+    <img src="/images/13.png" width="400px"</img> 
+    <img src="/images/14.png" width="400px"</img> 
+</div>
+<div align="center">
+    <img src="/images/15.png" width="400px"</img> 
+    <img src="/images/16.png" width="400px"</img> 
+</div>
+<div align="center">
+    <img src="/images/17.png" width="400px"</img> 
+    <img src="/images/18.png" width="400px"</img> 
+</div>
+<div align="center">
+    <img src="/images/19.png" width="400px"</img> 
+    <img src="/images/20.png" width="400px"</img> 
+</div>
+<div align="center">
+    <img src="/images/21.png" width="400px"</img> 
+    <img src="/images/22.png" width="400px"</img> 
+</div>
+<div align="center">
+    <img src="/images/23.png" width="400px"</img> 
+    <img src="/images/24.png" width="400px"</img> 
+</div>
+<div align="center">
+    <img src="/images/25.png" width="400px"</img> 
+    <img src="/images/26.png" width="400px"</img> 
+</div>
+<div align="center">
+    <img src="/images/27.png" width="400px"</img> 
+</div>
+
+
 Feito com <3 usando o Flutter.
 
 **Notas do Autor:** Chegou um momento que meu cerebro tava fritando, eu tinha várias ideias de outras coisas para adicionar e fazer, mas chega! kkkkkkkkkk ah, e sim, tem alguns livros q n tem foto... e eu n consegui resolver isso criando uma api pra trazer essas imagens a parte pq o tempo é curto meus amigos...
