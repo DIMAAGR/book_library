@@ -392,6 +392,15 @@ Pipeline configurado para:
 </div>
 <div align="center">
     <img src="/Images/27.png" width="400px"</img> 
+    <img src="/Images/28.png" width="400px"</img> 
+</div>
+<div align="center">
+    <img src="/Images/29.png" width="400px"</img> 
+    <img src="/Images/30.png" width="400px"</img> 
+</div>
+<div align="center">
+    <img src="/Images/31.png" width="400px"</img> 
+    <img src="/Images/32.png" width="400px"</img> 
 </div>
 
 

@@ -26,7 +26,11 @@ class _OnboardViewState extends State<OnboardView> {
     widget.viewModel.event.addListener(() {
       final event = widget.viewModel.event.value;
       if (event is NavigateTo) {
-        if (mounted) context.goNamed(event.route);
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) {
+            context.goNamed(event.route);
+          }
+        });
       } else if (event is ShowErrorSnackBar) {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(event.message)));
