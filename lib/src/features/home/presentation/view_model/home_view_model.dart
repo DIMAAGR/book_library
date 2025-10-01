@@ -2,15 +2,15 @@ import 'package:book_library/src/core/failures/failures.dart';
 import 'package:book_library/src/core/state/ui_event.dart';
 import 'package:book_library/src/core/state/view_model_state.dart';
 import 'package:book_library/src/core/viewmodel/base_view_model.dart';
-import 'package:book_library/src/features/books/domain/entities/book_entity.dart';
+import 'package:book_library/src/core/viewmodel/cover_prefetch_mixin.dart';
 import 'package:book_library/src/features/books/domain/usecases/get_all_books_use_case.dart';
 import 'package:book_library/src/features/books/domain/usecases/get_categories_use_case.dart';
-import 'package:book_library/src/features/books_details/domain/entites/external_book_info_entity.dart';
+import 'package:book_library/src/features/books_details/domain/entities/external_book_info_entity.dart';
 import 'package:book_library/src/features/books_details/services/external_book_info_resolver.dart';
 import 'package:book_library/src/features/home/presentation/view_model/home_state_object.dart';
 import 'package:flutter/foundation.dart';
 
-class HomeViewModel extends BaseViewModel {
+class HomeViewModel extends BaseViewModel with CoverPrefetchMixin {
   HomeViewModel(this._getBooks, this._getCategories, this._resolver);
 
   final GetAllBooksUseCase _getBooks;
@@ -55,8 +55,14 @@ class HomeViewModel extends BaseViewModel {
               explore: explore,
             );
 
-            _prefetchFor(library.take(6));
-            _prefetchFor(explore.take(6));
+            final libSlice = library.take(6);
+            final expSlice = explore.take(6);
+
+            prefetchFor(libSlice);
+            prefetchMissingCovers(libSlice);
+
+            prefetchFor(expSlice);
+            prefetchMissingCovers(expSlice);
           },
         );
       },
@@ -74,20 +80,20 @@ class HomeViewModel extends BaseViewModel {
       activeCategoryId: id,
     );
 
-    _prefetchFor(state.value.library.take(6));
+    final slice = state.value.library.take(6);
+    prefetchFor(slice);
+    prefetchMissingCovers(slice);
   }
 
-  Future<void> resolveFor(BookEntity book) async {
-    if (state.value.byBookId.containsKey(book.id)) return;
-    final info = await _resolver.resolve(book.title, book.author);
-    if (info == null) return;
-    final next = Map<String, ExternalBookInfoEntity>.from(state.value.byBookId)..[book.id] = info;
+  @override
+  ExternalBookInfoResolver get coverResolver => _resolver;
+
+  @override
+  Map<String, ExternalBookInfoEntity> readByBookId() => state.value.byBookId;
+
+  @override
+  void writeByBookId(Map<String, ExternalBookInfoEntity> next) {
     state.value = state.value.copyWith(byBookId: next);
-  }
-
-  Future<void> _prefetchFor(Iterable<BookEntity> books) async {
-    final pairs = books.map((b) => (title: b.title, author: b.author));
-    await _resolver.prefetch(pairs);
   }
 
   @override

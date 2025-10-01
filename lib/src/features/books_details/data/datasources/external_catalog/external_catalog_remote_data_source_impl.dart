@@ -12,7 +12,7 @@ class ExternalCatalogRemoteDataSourceImpl implements ExternalCatalogRemoteDataSo
     required String author,
   }) async {
     final q = 'intitle:${title.trim()}';
-    final params = <String, dynamic>{'q': q, 'maxResults': 1};
+    final params = <String, dynamic>{'q': q, 'maxResults': 10};
 
     final res = await dio.get(ApiPaths.volumes, queryParameters: params);
     return res.data as Map<String, dynamic>;

@@ -2,9 +2,10 @@ import 'package:book_library/src/core/failures/failures.dart';
 import 'package:book_library/src/core/state/ui_event.dart';
 import 'package:book_library/src/core/state/view_model_state.dart';
 import 'package:book_library/src/core/viewmodel/base_view_model.dart';
+import 'package:book_library/src/core/viewmodel/cover_prefetch_mixin.dart';
 import 'package:book_library/src/features/books/domain/entities/book_entity.dart';
 import 'package:book_library/src/features/books/domain/usecases/get_all_books_use_case.dart';
-import 'package:book_library/src/features/books_details/domain/entites/external_book_info_entity.dart';
+import 'package:book_library/src/features/books_details/domain/entities/external_book_info_entity.dart';
 import 'package:book_library/src/features/books_details/services/external_book_info_resolver.dart';
 import 'package:book_library/src/features/favorites/domain/use_cases/get_favorites_id_use_case.dart';
 import 'package:book_library/src/features/favorites/domain/use_cases/toggle_favorite_use_case.dart';
@@ -12,8 +13,13 @@ import 'package:book_library/src/features/favorites/presentation/view_model/favo
 import 'package:book_library/src/features/search/domain/strategies/sort_strategy.dart';
 import 'package:flutter/foundation.dart';
 
-class FavoritesViewModel extends BaseViewModel {
-  FavoritesViewModel(this.getAllBooks, this.getFavoritesIds, this.toggleFavorite, this.infoResolver);
+class FavoritesViewModel extends BaseViewModel with CoverPrefetchMixin {
+  FavoritesViewModel(
+    this.getAllBooks,
+    this.getFavoritesIds,
+    this.toggleFavorite,
+    this.infoResolver,
+  );
 
   final GetAllBooksUseCase getAllBooks;
   final GetFavoritesIdsUseCase getFavoritesIds;
@@ -49,15 +55,12 @@ class FavoritesViewModel extends BaseViewModel {
         final onlyFavs = all.where((b) => favIds.contains(b.id)).toList();
         final sorted = state.value.sort.sort(onlyFavs);
 
-        state.value = state.value.copyWith(state: SuccessState<Failure, List<BookEntity>>(all), items: sorted);
+        state.value = state.value.copyWith(
+          state: SuccessState<Failure, List<BookEntity>>(all),
+          items: sorted,
+        );
 
-        for (final b in sorted.take(16)) {
-          if (isDisposed) break;
-          final info = await infoResolver.resolve(b.title, b.author);
-          if (isDisposed || info == null) continue;
-          final next = Map<String, ExternalBookInfoEntity>.from(state.value.byBookId)..[b.id] = info;
-          state.value = state.value.copyWith(byBookId: next);
-        }
+        await prefetchMissingCovers(sorted.take(16));
       },
     );
   }
@@ -84,5 +87,16 @@ class FavoritesViewModel extends BaseViewModel {
   void dispose() {
     state.dispose();
     super.dispose();
+  }
+
+  @override
+  ExternalBookInfoResolver get coverResolver => infoResolver;
+
+  @override
+  Map<String, ExternalBookInfoEntity> readByBookId() => state.value.byBookId;
+
+  @override
+  void writeByBookId(Map<String, ExternalBookInfoEntity> next) {
+    state.value = state.value.copyWith(byBookId: next);
   }
 }

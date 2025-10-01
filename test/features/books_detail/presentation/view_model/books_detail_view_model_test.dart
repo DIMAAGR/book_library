@@ -1,7 +1,7 @@
 import 'package:book_library/src/core/failures/failures.dart';
 import 'package:book_library/src/core/state/view_model_state.dart';
 import 'package:book_library/src/features/books/domain/entities/book_entity.dart';
-import 'package:book_library/src/features/books_details/domain/entites/external_book_info_entity.dart';
+import 'package:book_library/src/features/books_details/domain/entities/external_book_info_entity.dart';
 import 'package:book_library/src/features/books_details/presentation/view_model/books_details_state_object.dart';
 import 'package:book_library/src/features/books_details/presentation/view_model/books_details_view_model.dart';
 import 'package:dartz/dartz.dart';
@@ -75,9 +75,9 @@ void main() {
 
     test('continua mesmo se algum Either vier com Left', () async {
       when(mockResolver.resolve(book.title, book.author)).thenAnswer((_) async => null);
-      when(mockIsFavorite(book.id)).thenAnswer((_) async => Left(StorageFailure('x')));
-      when(mockIsReading(book.id)).thenAnswer((_) async => Left(StorageFailure('y')));
-      when(mockGetProgress(book.id)).thenAnswer((_) async => Left(StorageFailure('z')));
+      when(mockIsFavorite(book.id)).thenAnswer((_) async => const Left(StorageFailure('x')));
+      when(mockIsReading(book.id)).thenAnswer((_) async => const Left(StorageFailure('y')));
+      when(mockGetProgress(book.id)).thenAnswer((_) async => const Left(StorageFailure('z')));
       when(mockGetAll()).thenAnswer((_) async => const Right([book]));
 
       vm.init(book);

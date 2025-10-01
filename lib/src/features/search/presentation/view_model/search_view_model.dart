@@ -1,11 +1,12 @@
-import 'package:book_library/src/core/collections/map_collection.dart';
 import 'package:book_library/src/core/failures/failures.dart';
 import 'package:book_library/src/core/state/ui_event.dart';
 import 'package:book_library/src/core/state/view_model_state.dart';
 import 'package:book_library/src/core/viewmodel/base_view_model.dart';
+import 'package:book_library/src/core/viewmodel/cover_prefetch_mixin.dart';
 import 'package:book_library/src/features/books/domain/entities/book_entity.dart';
 import 'package:book_library/src/features/books/domain/usecases/get_all_books_use_case.dart';
 import 'package:book_library/src/features/books/domain/usecases/get_book_by_title_use_case.dart';
+import 'package:book_library/src/features/books_details/domain/entities/external_book_info_entity.dart';
 import 'package:book_library/src/features/books_details/services/external_book_info_resolver.dart';
 import 'package:book_library/src/features/favorites/domain/use_cases/get_favorites_id_use_case.dart';
 import 'package:book_library/src/features/favorites/domain/use_cases/toggle_favorite_use_case.dart';
@@ -17,7 +18,7 @@ import 'package:book_library/src/features/search/presentation/view_model/search_
 import 'package:dartz/dartz.dart';
 import 'package:flutter/foundation.dart';
 
-class SearchViewModel extends BaseViewModel {
+class SearchViewModel extends BaseViewModel with CoverPrefetchMixin {
   SearchViewModel(
     this._getAll,
     this._getByTitle,
@@ -97,14 +98,6 @@ class SearchViewModel extends BaseViewModel {
 
   bool hasInfoFor(String bookId) => state.value.byBookId.containsKey(bookId);
 
-  Future<void> resolveFor(BookEntity book) async {
-    if (isDisposed || hasInfoFor(book.id)) return;
-    final info = await _resolver.resolve(book.title, book.author);
-    if (isDisposed || info == null) return;
-    final nextMap = copyWithEntry(state.value.byBookId, book.id, info);
-    state.value = state.value.copyWith(byBookId: nextMap);
-  }
-
   Future<void> _searchNow() async {
     state.value = state.value.copyWith(state: LoadingState<Failure, SearchPayload>());
 
@@ -123,7 +116,9 @@ class SearchViewModel extends BaseViewModel {
         state.value = state.value.copyWith(
           state: SuccessState<Failure, SearchPayload>(SearchPayload(items: filtered)),
         );
-        await _prefetchFor(filtered.take(10));
+        final slice = filtered.take(10);
+        await prefetchFor(slice);
+        await prefetchMissingCovers(slice);
       },
     );
   }
@@ -135,9 +130,14 @@ class SearchViewModel extends BaseViewModel {
     return f.sort.sort(filtered);
   }
 
-  Future<void> _prefetchFor(Iterable<BookEntity> books) async {
-    if (isDisposed) return;
-    final pairs = books.map((b) => (title: b.title, author: b.author));
-    await _resolver.prefetch(pairs);
+  @override
+  ExternalBookInfoResolver get coverResolver => _resolver;
+
+  @override
+  Map<String, ExternalBookInfoEntity> readByBookId() => state.value.byBookId;
+
+  @override
+  void writeByBookId(Map<String, ExternalBookInfoEntity> next) {
+    state.value = state.value.copyWith(byBookId: next);
   }
 }

@@ -334,3 +334,10 @@ Pipeline configurado para:
 - rodar `flutter analyze` (sem warnings)  
 - rodar `flutter test`  
 - build do app (debug)
+
+
+Feito com <3 usando o Flutter.
+
+**Notas do Autor:** Chegou um momento que meu cerebro tava fritando, eu tinha várias ideias de outras coisas para adicionar e fazer, mas chega! kkkkkkkkkk ah, e sim, tem alguns livros q n tem foto... e eu n consegui resolver isso criando uma api pra trazer essas imagens a parte pq o tempo é curto meus amigos...
+
+mas tá ai! muito bom o projeto eu gostei mt de fazer, tudo bem que torrou meus miolos mas isso é história para outro dia

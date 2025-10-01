@@ -1,7 +1,7 @@
 import 'package:book_library/src/core/failures/failures.dart';
 import 'package:book_library/src/core/state/view_model_state.dart';
 import 'package:book_library/src/features/books/domain/entities/book_entity.dart';
-import 'package:book_library/src/features/books_details/domain/entites/external_book_info_entity.dart';
+import 'package:book_library/src/features/books_details/domain/entities/external_book_info_entity.dart';
 import 'package:book_library/src/features/search/domain/strategies/sort_strategy.dart';
 import 'package:book_library/src/features/search/domain/value_objects/book_query.dart';
 import 'package:book_library/src/features/search/presentation/view_model/search_state_object.dart';
@@ -116,21 +116,46 @@ void main() {
   });
 
   group('resolveFor()', () {
-    test('usa resolver e popula byBookId; chamadas repetidas coalescem pelo map', () async {
+    test('resolveCoverIfMissing chama UMA vez quando não está no mapa', () async {
       when(mockGetFavs()).thenAnswer((_) async => const Right(<String>{}));
       when(mockGetAll()).thenAnswer((_) async => const Right([b1]));
+      when(mockResolver.prefetch(any)).thenAnswer((_) async {});
       when(
         mockResolver.resolve(b1.title, b1.author),
       ).thenAnswer((_) async => const ExternalBookInfoEntity(title: 'Clean Code', isbn13: '123'));
 
       await vm.init();
-      await vm.resolveFor(b1);
-      await vm.resolveFor(b1);
+      vm.consumeEvent();
 
-      final map = vm.state.value.byBookId;
-      expect(map.containsKey('1'), true);
-      expect(map['1']?.isbn13, '123');
-      verify(mockResolver.resolve(b1.title, b1.author)).called(1);
+      vm.state.value = vm.state.value.copyWith(byBookId: {});
+
+      await vm.resolveCoverIfMissing(b1);
+      expect(vm.state.value.byBookId.containsKey('1'), isTrue);
+      reset(mockResolver);
+      await vm.resolveCoverIfMissing(b1);
+      verifyZeroInteractions(mockResolver);
+
+      expect(vm.state.value.byBookId['1']?.isbn13, '123');
+    });
+
+    test('resolveCoverIfMissing NÃO chama quando já há info no mapa', () async {
+      when(mockGetFavs()).thenAnswer((_) async => const Right(<String>{}));
+      when(mockGetAll()).thenAnswer((_) async => const Right([b1]));
+      when(mockResolver.prefetch(any)).thenAnswer((_) async {});
+
+      await vm.init();
+      vm.consumeEvent();
+
+      vm.state.value = vm.state.value.copyWith(
+        byBookId: const {'1': ExternalBookInfoEntity(title: 'Clean Code', isbn13: '123')},
+      );
+
+      clearInteractions(mockResolver);
+
+      await vm.resolveCoverIfMissing(b1);
+      await vm.resolveCoverIfMissing(b1);
+
+      verifyNever(mockResolver.resolve(b1.title, b1.author));
     });
   });
 

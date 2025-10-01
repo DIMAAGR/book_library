@@ -20,6 +20,9 @@ dependencies:
   dio: ^5.9.0
   flutter_dotenv: ^6.0.0
   share_plus: ^12.0.0
+  html: ^0.15.6
+  epubx: ^4.0.0
+  archive: ^3.6.1
   
   
 
@@ -37,6 +40,7 @@ flutter:
     - assets/fonts/montserrat/
     - assets/fonts/roboto/
     - assets/images/
+    - assets/epub/
     - .env
 
   fonts:

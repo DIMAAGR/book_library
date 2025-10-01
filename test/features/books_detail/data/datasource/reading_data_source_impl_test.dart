@@ -27,7 +27,12 @@ void main() {
       final k = inv.positionalArguments[0] as String;
       final v = inv.positionalArguments[1] as String;
       store[k] = v;
+      return true;
+    });
 
+    when(prefs.remove(any)).thenAnswer((inv) async {
+      final k = inv.positionalArguments[0] as String;
+      store.remove(k);
       return true;
     });
 
@@ -35,12 +40,13 @@ void main() {
   });
 
   group('ReadingLocalDataSourceImpl', () {
-    test('estado inicial: isReading=false e progress=0 quando storage está vazio', () async {
+    test('estado inicial: isReading=false e progress=0 com storage vazio', () async {
       final r = await dataSource.isReading('id-1');
       final p = await dataSource.getProgress('id-1');
 
       expect(r, false);
       expect(p, 0);
+
       verify(prefs.getString(StorageSchema.readingKey)).called(greaterThan(0));
     });
 
@@ -58,7 +64,7 @@ void main() {
       expect(finalCheck, false);
     });
 
-    test('setProgress clampa [0,100] e adiciona id ao conjunto de leitura quando > 0', () async {
+    test('setProgress clampa [0,100] e adiciona id ao conjunto quando > 0', () async {
       await dataSource.setProgress('b', -10);
       expect(await dataSource.getProgress('b'), 0);
       expect(await dataSource.isReading('b'), false);
@@ -80,6 +86,37 @@ void main() {
       final ds2 = ReadingLocalDataSourceImpl(prefs);
       expect(await ds2.isReading('keep'), true);
       expect(await ds2.getProgress('keep'), 33);
+    });
+
+    test('writeAll() sobrescreve todo o estado e readAll() retorna o bruto', () async {
+      expect(await dataSource.readAll(), isEmpty);
+
+      final payload = <String, dynamic>{
+        'readingIds': ['a', 'b'],
+        'progressById': {'a': 10, 'b': 80},
+      };
+      await dataSource.writeAll(payload);
+
+      final raw = await dataSource.readAll();
+      expect(raw, equals(payload));
+
+      expect(await dataSource.isReading('a'), true);
+      expect(await dataSource.getProgress('b'), 80);
+    });
+
+    test('formato serializado é estável (readingIds: List, progressById: Map)', () async {
+      await dataSource.toggleReading('x');
+      await dataSource.setProgress('x', 25);
+
+      final raw = store[StorageSchema.readingKey]!;
+      final decoded = jsonDecode(raw) as Map<String, dynamic>;
+
+      expect(decoded['readingIds'], isA<List>());
+      expect(List<String>.from(decoded['readingIds'] as List), contains('x'));
+
+      expect(decoded['progressById'], isA<Map>());
+      final m = Map<String, dynamic>.from(decoded['progressById'] as Map);
+      expect(m['x'], 25);
     });
   });
 }

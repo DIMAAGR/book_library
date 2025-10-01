@@ -1,6 +1,6 @@
 import 'package:book_library/src/core/failures/failures.dart';
 import 'package:book_library/src/core/presentation/extensions/color_ext.dart';
-import 'package:book_library/src/core/presentation/views/offiline_view.dart';
+import 'package:book_library/src/core/presentation/views/offline_view.dart';
 import 'package:book_library/src/core/presentation/widgets/book_library_app_bar.dart';
 import 'package:book_library/src/core/presentation/widgets/book_library_bottom_navigation_bar.dart';
 import 'package:book_library/src/core/presentation/widgets/snackbars.dart';
@@ -58,7 +58,7 @@ class _FavoritesViewState extends State<FavoritesView> {
     final c = Theme.of(context).colors;
 
     return Scaffold(
-      appBar: const BookLibraryAppBar(title: 'Saved', showMenu: true, showSearch: true),
+      appBar: const BookLibraryAppBar(title: 'Saved', showSearch: true),
       bottomNavigationBar: const BookLibraryBottomNavigationBar(),
       backgroundColor: c.background,
       body: SafeArea(

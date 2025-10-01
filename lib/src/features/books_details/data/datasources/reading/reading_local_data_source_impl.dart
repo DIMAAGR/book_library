@@ -72,4 +72,17 @@ class ReadingLocalDataSourceImpl implements ReadingLocalDataSource {
 
     await _saveState(readingIds: ids, progressById: progress);
   }
+
+  @override
+  Future<Map<String, dynamic>> readAll() async {
+    final raw = _wrapper.getString(StorageSchema.readingKey);
+    if (raw == null || raw.isEmpty) return <String, dynamic>{};
+    return jsonDecode(raw) as Map<String, dynamic>;
+  }
+
+  @override
+  Future<void> writeAll(Map<String, dynamic>? m) async {
+    if (m == null) throw ArgumentError('Map cannot be null');
+    await _wrapper.setString(StorageSchema.readingKey, jsonEncode(m));
+  }
 }

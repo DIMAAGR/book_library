@@ -11,7 +11,15 @@ class ExternalCatalogVolumeModel {
     if (items.isEmpty) {
       return const ExternalCatalogVolumeModel(title: '');
     }
-    final item = items.first as Map<String, dynamic>;
+    late Map<String, dynamic> item;
+
+    for (Map<String, dynamic> i in items) {
+      // ignore: avoid_dynamic_calls
+      if (i['volumeInfo']['imageLinks'] != null) {
+        item = i;
+        break;
+      }
+    }
     final info = (item['volumeInfo'] as Map?) ?? const {};
     final images = (info['imageLinks'] as Map?) ?? const {};
     final idents = (info['industryIdentifiers'] as List?) ?? const [];

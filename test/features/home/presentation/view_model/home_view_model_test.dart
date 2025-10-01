@@ -3,7 +3,7 @@ import 'package:book_library/src/core/state/ui_event.dart';
 import 'package:book_library/src/core/state/view_model_state.dart';
 import 'package:book_library/src/features/books/domain/entities/book_entity.dart';
 import 'package:book_library/src/features/books/domain/entities/category_entity.dart';
-import 'package:book_library/src/features/books_details/domain/entites/external_book_info_entity.dart';
+import 'package:book_library/src/features/books_details/domain/entities/external_book_info_entity.dart';
 import 'package:book_library/src/features/home/presentation/view_model/home_state_object.dart';
 import 'package:book_library/src/features/home/presentation/view_model/home_view_model.dart';
 import 'package:dartz/dartz.dart';
@@ -46,9 +46,13 @@ void main() {
     test('emite SuccessState + prefetch (duas listas) e seta activeCategoryId', () async {
       when(mockGetCategories.call()).thenAnswer((_) async => Right(categories));
       when(mockGetBooks.call()).thenAnswer((_) async => Right(books));
+
       when(mockResolver.prefetch(any)).thenAnswer((_) async {});
+      when(mockResolver.resolve(any, any)).thenAnswer((_) async => null);
 
       await vm.load();
+
+      await Future<void>.delayed(Duration.zero);
 
       final home = vm.state.value;
       expect(home.state, isA<SuccessState<Failure, HomePayload>>());
@@ -60,7 +64,8 @@ void main() {
       expect(home.explore.length, books.length - home.library.length);
 
       verify(mockResolver.prefetch(any)).called(2);
-      verifyNoMoreInteractions(mockResolver);
+
+      verify(mockResolver.resolve(any, any)).called(lessThanOrEqualTo(12));
 
       expect(vm.event.value, isNull);
     });
@@ -127,7 +132,7 @@ void main() {
     });
   });
 
-  group('resolveFor()', () {
+  group('resolveCoverIfMissing()', () {
     test('resolve e popula byBookId dentro do HomeState; evita chamadas repetidas', () async {
       final b = books.first;
       const info = ExternalBookInfoEntity(
@@ -139,11 +144,11 @@ void main() {
 
       when(mockResolver.resolve(b.title, b.author)).thenAnswer((_) async => info);
 
-      await vm.resolveFor(b);
+      await vm.resolveCoverIfMissing(b);
       expect(vm.state.value.byBookId[b.id], info);
       verify(mockResolver.resolve(b.title, b.author)).called(1);
 
-      await vm.resolveFor(b);
+      await vm.resolveCoverIfMissing(b);
       verifyNoMoreInteractions(mockResolver);
     });
   });

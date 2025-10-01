@@ -6,6 +6,7 @@
 import 'dart:async' as _i14;
 
 import 'package:book_library/src/core/failures/failures.dart' as _i18;
+import 'package:book_library/src/core/models/reader_paragraph.dart' as _i59;
 import 'package:book_library/src/core/services/cache/cache.dart' as _i4;
 import 'package:book_library/src/core/services/coalescing/inflight_coalescer.dart'
     as _i6;
@@ -13,6 +14,10 @@ import 'package:book_library/src/core/services/concurrency/concurrency_limiter.d
     as _i5;
 import 'package:book_library/src/core/services/key/canonical_key_strategy.dart'
     as _i7;
+import 'package:book_library/src/core/services/reader/reader_content_service.dart'
+    as _i58;
+import 'package:book_library/src/core/services/reader/reader_progress_service.dart'
+    as _i60;
 import 'package:book_library/src/core/services/share/share_services.dart'
     as _i45;
 import 'package:book_library/src/core/storage/wrapper/shared_preferences_wrapper.dart'
@@ -39,7 +44,7 @@ import 'package:book_library/src/features/books_details/data/datasources/externa
     as _i30;
 import 'package:book_library/src/features/books_details/data/datasources/reading/reading_local_data_source.dart'
     as _i43;
-import 'package:book_library/src/features/books_details/domain/entites/external_book_info_entity.dart'
+import 'package:book_library/src/features/books_details/domain/entities/external_book_info_entity.dart'
     as _i28;
 import 'package:book_library/src/features/books_details/domain/repositories/book_details_repository.dart'
     as _i31;
@@ -79,6 +84,22 @@ import 'package:book_library/src/features/onboard/presentation/models/onboard_sl
     as _i20;
 import 'package:book_library/src/features/onboard/presentation/services/onboard_content_provider.dart'
     as _i19;
+import 'package:book_library/src/features/reader/data/datasource/reader_local_data_source.dart'
+    as _i52;
+import 'package:book_library/src/features/reader/data/models/reader_settings_model.dart'
+    as _i53;
+import 'package:book_library/src/features/reader/domain/entity/reader_settings_entity.dart'
+    as _i51;
+import 'package:book_library/src/features/reader/domain/repository/reader_repository.dart'
+    as _i50;
+import 'package:book_library/src/features/reader/domain/services/page_estimator.dart'
+    as _i56;
+import 'package:book_library/src/features/reader/domain/use_cases/get_reader_settings_use_case.dart'
+    as _i54;
+import 'package:book_library/src/features/reader/domain/use_cases/write_reader_settings_use_case.dart'
+    as _i55;
+import 'package:book_library/src/features/reader/presentation/view_model/reader_state_object.dart'
+    as _i57;
 import 'package:dartz/dartz.dart' as _i2;
 import 'package:dio/src/adapter.dart' as _i10;
 import 'package:dio/src/cancel_token.dart' as _i29;
@@ -1719,6 +1740,25 @@ class MockReadingLocalDataSource extends _i1.Mock
             returnValueForMissingStub: _i14.Future<void>.value(),
           )
           as _i14.Future<void>);
+
+  @override
+  _i14.Future<Map<String, dynamic>> readAll() =>
+      (super.noSuchMethod(
+            Invocation.method(#readAll, []),
+            returnValue: _i14.Future<Map<String, dynamic>>.value(
+              <String, dynamic>{},
+            ),
+          )
+          as _i14.Future<Map<String, dynamic>>);
+
+  @override
+  _i14.Future<void> writeAll(Map<String, dynamic>? m) =>
+      (super.noSuchMethod(
+            Invocation.method(#writeAll, [m]),
+            returnValue: _i14.Future<void>.value(),
+            returnValueForMissingStub: _i14.Future<void>.value(),
+          )
+          as _i14.Future<void>);
 }
 
 /// A class which mocks [ReadingRepository].
@@ -1892,4 +1932,210 @@ class MockSetProgressUseCase extends _i1.Mock
             ),
           )
           as _i14.Future<_i2.Either<_i18.Failure, _i2.Unit>>);
+}
+
+/// A class which mocks [ReaderSettingsRepository].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockReaderSettingsRepository extends _i1.Mock
+    implements _i50.ReaderSettingsRepository {
+  MockReaderSettingsRepository() {
+    _i1.throwOnMissingStub(this);
+  }
+
+  @override
+  _i14.Future<_i2.Either<_i18.Failure, _i51.ReaderSettingsEntity>>
+  getSettings() =>
+      (super.noSuchMethod(
+            Invocation.method(#getSettings, []),
+            returnValue:
+                _i14.Future<
+                  _i2.Either<_i18.Failure, _i51.ReaderSettingsEntity>
+                >.value(
+                  _FakeEither_0<_i18.Failure, _i51.ReaderSettingsEntity>(
+                    this,
+                    Invocation.method(#getSettings, []),
+                  ),
+                ),
+          )
+          as _i14.Future<_i2.Either<_i18.Failure, _i51.ReaderSettingsEntity>>);
+
+  @override
+  _i14.Future<_i2.Either<_i18.Failure, void>> setSettings(
+    _i51.ReaderSettingsEntity? settings,
+  ) =>
+      (super.noSuchMethod(
+            Invocation.method(#setSettings, [settings]),
+            returnValue: _i14.Future<_i2.Either<_i18.Failure, void>>.value(
+              _FakeEither_0<_i18.Failure, void>(
+                this,
+                Invocation.method(#setSettings, [settings]),
+              ),
+            ),
+          )
+          as _i14.Future<_i2.Either<_i18.Failure, void>>);
+}
+
+/// A class which mocks [ReaderSettingsLocalDataSource].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockReaderSettingsLocalDataSource extends _i1.Mock
+    implements _i52.ReaderSettingsLocalDataSource {
+  MockReaderSettingsLocalDataSource() {
+    _i1.throwOnMissingStub(this);
+  }
+
+  @override
+  _i14.Future<_i53.ReaderSettingsModel?> read() =>
+      (super.noSuchMethod(
+            Invocation.method(#read, []),
+            returnValue: _i14.Future<_i53.ReaderSettingsModel?>.value(),
+          )
+          as _i14.Future<_i53.ReaderSettingsModel?>);
+
+  @override
+  _i14.Future<void> write(_i53.ReaderSettingsModel? model) =>
+      (super.noSuchMethod(
+            Invocation.method(#write, [model]),
+            returnValue: _i14.Future<void>.value(),
+            returnValueForMissingStub: _i14.Future<void>.value(),
+          )
+          as _i14.Future<void>);
+}
+
+/// A class which mocks [GetReaderSettingsUseCase].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockGetReaderSettingsUseCase extends _i1.Mock
+    implements _i54.GetReaderSettingsUseCase {
+  MockGetReaderSettingsUseCase() {
+    _i1.throwOnMissingStub(this);
+  }
+
+  @override
+  _i14.Future<_i2.Either<_i18.Failure, _i51.ReaderSettingsEntity>> call() =>
+      (super.noSuchMethod(
+            Invocation.method(#call, []),
+            returnValue:
+                _i14.Future<
+                  _i2.Either<_i18.Failure, _i51.ReaderSettingsEntity>
+                >.value(
+                  _FakeEither_0<_i18.Failure, _i51.ReaderSettingsEntity>(
+                    this,
+                    Invocation.method(#call, []),
+                  ),
+                ),
+          )
+          as _i14.Future<_i2.Either<_i18.Failure, _i51.ReaderSettingsEntity>>);
+}
+
+/// A class which mocks [SetReaderSettingsUseCase].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockSetReaderSettingsUseCase extends _i1.Mock
+    implements _i55.SetReaderSettingsUseCase {
+  MockSetReaderSettingsUseCase() {
+    _i1.throwOnMissingStub(this);
+  }
+
+  @override
+  _i14.Future<_i2.Either<_i18.Failure, void>> call(
+    _i51.ReaderSettingsEntity? settings,
+  ) =>
+      (super.noSuchMethod(
+            Invocation.method(#call, [settings]),
+            returnValue: _i14.Future<_i2.Either<_i18.Failure, void>>.value(
+              _FakeEither_0<_i18.Failure, void>(
+                this,
+                Invocation.method(#call, [settings]),
+              ),
+            ),
+          )
+          as _i14.Future<_i2.Either<_i18.Failure, void>>);
+}
+
+/// A class which mocks [PageEstimator].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockPageEstimator extends _i1.Mock implements _i56.PageEstimator {
+  MockPageEstimator() {
+    _i1.throwOnMissingStub(this);
+  }
+
+  @override
+  int estimateTotalPages({
+    required int? paragraphCount,
+    required double? fontSize,
+    required _i57.ReaderLineHeight? lineHeight,
+  }) =>
+      (super.noSuchMethod(
+            Invocation.method(#estimateTotalPages, [], {
+              #paragraphCount: paragraphCount,
+              #fontSize: fontSize,
+              #lineHeight: lineHeight,
+            }),
+            returnValue: 0,
+          )
+          as int);
+}
+
+/// A class which mocks [ReaderContentService].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockReaderContentService extends _i1.Mock
+    implements _i58.ReaderContentService {
+  MockReaderContentService() {
+    _i1.throwOnMissingStub(this);
+  }
+
+  @override
+  _i14.Future<List<_i59.ReaderParagraph>> loadFromAsset(String? assetPath) =>
+      (super.noSuchMethod(
+            Invocation.method(#loadFromAsset, [assetPath]),
+            returnValue: _i14.Future<List<_i59.ReaderParagraph>>.value(
+              <_i59.ReaderParagraph>[],
+            ),
+          )
+          as _i14.Future<List<_i59.ReaderParagraph>>);
+}
+
+/// A class which mocks [ReaderProgressService].
+///
+/// See the documentation for Mockito's code generation for more information.
+class MockReaderProgressService extends _i1.Mock
+    implements _i60.ReaderProgressService {
+  MockReaderProgressService() {
+    _i1.throwOnMissingStub(this);
+  }
+
+  @override
+  (int, int) compute(
+    int? totalPages,
+    double? scrollRatio,
+    int? currentPercent,
+  ) =>
+      (super.noSuchMethod(
+            Invocation.method(#compute, [
+              totalPages,
+              scrollRatio,
+              currentPercent,
+            ]),
+            returnValue: (0, 0),
+          )
+          as (int, int));
+
+  @override
+  _i14.Future<void> saveDebounced(String? bookId, int? percent) =>
+      (super.noSuchMethod(
+            Invocation.method(#saveDebounced, [bookId, percent]),
+            returnValue: _i14.Future<void>.value(),
+            returnValueForMissingStub: _i14.Future<void>.value(),
+          )
+          as _i14.Future<void>);
+
+  @override
+  void dispose() => super.noSuchMethod(
+    Invocation.method(#dispose, []),
+    returnValueForMissingStub: null,
+  );
 }

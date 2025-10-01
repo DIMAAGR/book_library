@@ -1,5 +1,5 @@
 import 'package:book_library/src/core/failures/failures.dart';
-import 'package:book_library/src/core/presentation/views/offiline_view.dart';
+import 'package:book_library/src/core/presentation/views/offline_view.dart';
 import 'package:book_library/src/core/presentation/widgets/book_library_app_bar.dart';
 import 'package:book_library/src/core/presentation/widgets/book_library_bottom_navigation_bar.dart';
 import 'package:book_library/src/core/presentation/widgets/category_chips.dart';
@@ -67,12 +67,7 @@ class _HomeViewState extends State<HomeView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const BookLibraryAppBar(
-        title: 'Library',
-        showMenu: true,
-        showSearch: true,
-        showSettings: true,
-      ),
+      appBar: const BookLibraryAppBar(title: 'Library', showSearch: true),
       bottomNavigationBar: const BookLibraryBottomNavigationBar(),
       body: SafeArea(
         child: ValueListenableBuilder<HomeStateObject>(
@@ -109,7 +104,7 @@ class _HomeViewState extends State<HomeView> {
                   ),
                   HorizontalBooksList(
                     list: home.library,
-                    resolveFor: viewModel.resolveFor,
+                    resolveFor: viewModel.resolveCoverIfMissing,
                     homeState: viewModel.state,
                   ),
                   const SizedBox(height: 16),
@@ -119,7 +114,7 @@ class _HomeViewState extends State<HomeView> {
                   ),
                   HorizontalBooksList(
                     list: home.explore,
-                    resolveFor: viewModel.resolveFor,
+                    resolveFor: viewModel.resolveCoverIfMissing,
                     homeState: viewModel.state,
                     showStars: false,
                     showPercentage: false,
